@@ -473,7 +473,7 @@ server <- function(input, output, session) {
   output$surveytable <- renderPlot({
     req(!(input$species %in% c("None selected", "")))
     survey_table(all_data %>% filter(survey %in% region_names()), input$species, form = 2)
-  }, width = 1500,  height = function() {
+  }, width = 1200,  height = function() {
     200 * length(region_names()) #dynamically change plot size based on amount
   })
   observeEvent(
