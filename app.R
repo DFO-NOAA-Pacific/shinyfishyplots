@@ -169,30 +169,47 @@ ui <- page_sidebar(
              ),
     
     tabPanel("Biomass",
-             conditionalPanel( #only show card whe  all regions selected
+             conditionalPanel( #only show card when all regions selected
                condition = "input.region == 'All regions'",
-             card(
-               full_screen = FALSE,
-               card_header("Design-Based Biomass Indicies"),
+               accordion(
+                 open = NULL,
+                 accordion_panel(
+                   title = "Design-Based Biomass Indicies",
                card_body(
                  tags$p("When", 
                  tags$strong("'All Regions'"),
-                 " is selected, only standardized biomass indicies are shown and can be viewed for multiple survey areas. See 'About the Data' in the 'Home' tab for more information on these survey areas." )
-               ) )),
+                 " is selected, only standardized biomass indicies are shown and can be viewed for multiple survey areas. See 'About the Data' in the 'Home' tab for more information on these survey areas." ))) )),
+             conditionalPanel( #only show card when all regions NOT selected
+               condition = "input.region != 'All regions'",
+               accordion(
+                 open = NULL,
+                 accordion_panel(
+                   title = "Design-Based Biomass Indicies",
+               card_body(tags$div("These biomass indicies are design-based and may be calculated differently among science centers.", 
+                                  tags$strong("Some years of biomass estimations may be missing between surveys."),
+                                  "To compare standardized biomass estimations or view them individually, select 'All Regions' for an additional survey menu. See 'About the Data' in the 'Home' tab for more information on these survey areas."))))),
+             
              uiOutput("dbiPlotUI"), #dynamic height
              downloadButton("downloadBiomass", "Download Biomass Plot"),
              downloadButton("downloadStanBiomass", "Download Standardized Biomass Plot")), 
     tabPanel("Age and length",
              uiOutput("dynamic_agelength"),
+             card(
+               full_screen = FALSE,
+               card_header("Model Info"),
+               card_body(tags$div(tags$strong("Growth:"),"Von-Bertalanffy growth curve"),
+                         tags$div(tags$strong("Length-Weight:"), "Log-log regression"),
+                         tags$div("See 'Data' tab to download biological and prediction datasets used in these plots."))),
              downloadButton("downloadGrowth", "Download growth plot"),
              downloadButton("downloadLW", "Download length-weight plot"),
              downloadButton("downloadLTS", "Download average lengths plot"),
              downloadButton("downloadAgeFreq", "Download age frequency plot"),
              downloadButton("downloadLengthFreq", "Download length frequency plot")),
     tabPanel("Maps",
-             card(
-               full_screen = FALSE,
-               card_header("Disclaimer"),
+             accordion(
+               open = NULL,
+               accordion_panel(
+                 title = "Disclaimer",
                card_body(
                  tags$p("Maps were made using land data from rnaturalearth ",
                  HTML(' <a href = "https://doi.org/10.32614/CRAN.package.rnaturalearth" target = "_self" >(Massicotte & South 2025)</a>.'),
@@ -201,7 +218,7 @@ ui <- page_sidebar(
                  "Because of differences in years or model settings, these results may not capture true distributions and may differ from other presentations. 
                 These maps are exploratory and should not be used as definitive sources for management decisions.")
                )
-             ),
+             )),
              uiOutput("dynamicMap"), #dynamic height
              downloadButton("downloadMapPlot", "Download map")),
     tabPanel("Depth",
@@ -209,18 +226,31 @@ ui <- page_sidebar(
              downloadButton("downloadAgeDepthPlot", "Download age-depth plot"),
              downloadButton("downloadLengthDepthPlot", "Download length-depth plot")),
     tabPanel("Data",
+             accordion(
+               open = NULL,
+               accordion_panel(
+                 title = "Sampling Overview",
+               card_body("These plots display the number of biological measurements taken and tow effort for selected regions and species. 'Unread Ages' are the number of fishes with age structures collected but not analysed. For completely unrounded counts, use the data download below. "))),
              div(style = "overflow-x: scroll; min-width: 1200px;",
                  plotOutput("surveytable")),
              downloadButton("downloadSurveyTable", "Download Survey Plot"),
              downloadButton("downloadSurveyTibble", "Download Survey Plot Data (Unrounded Counts)"),
+             tags$div(Style = "margin-top: 50px;"),
+             card(
+               full_screen = FALSE,
+               card_header("Data download options for selected region and species")),
              tableOutput("demotable"),
              downloadButton("downloadbio", "Download biological data"),
+             tags$div(Style = "margin-top: 50px;"),
              tableOutput("vbtable"),
              downloadButton("downloadvb", "Download growth predictions"),
+             tags$div(Style = "margin-top: 50px;"),
              tableOutput("lwtable"),
              downloadButton("downloadlw", "Download length-weight predictions"),
+             tags$div(Style = "margin-top: 50px;"),
              tableOutput("maptable"),
              downloadButton("downloadmap", "Download density predictions"),
+             tags$div(Style = "margin-top: 50px;"),
              tableOutput("dbitable"),
              downloadButton("downloaddbi", "Download design-based biomass indicies"))
   )
