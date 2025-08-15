@@ -398,9 +398,9 @@ server <- function(input, output, session) {
      
     
   if (input$region == "All regions") {
-    req(input$surveys_selected)
-  
-    #create message if there is no DBI data for all selected surveys
+    req(input$surveys_selected, input$species != "None selected")
+    
+      #create message if there is no DBI data for all selected surveys
     valid_dbi_surveys <- all.dbi %>% 
       filter(common_name == input$species, survey %in% input$surveys_selected)
     valid_dbi_surveys <-  unique(valid_dbi_surveys$survey)
@@ -473,8 +473,8 @@ server <- function(input, output, session) {
   output$surveytable <- renderPlot({
     req(!(input$species %in% c("None selected", "")))
     survey_table(all_data %>% filter(survey %in% region_names()), input$species, form = 2)
-  }, width = 1500,  height = function() {
-    200 * length(region_names()) #dynamically change plot size based on amount
+  }, width = 1200,  height = function() {
+    275 * length(region_names()) #dynamically change plot size based on amount
   })
   observeEvent(
   output$downloadSurveyTable <- downloadHandler(
