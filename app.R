@@ -186,7 +186,7 @@ ui <- page_sidebar(
                  accordion_panel(
                    title = "Design-Based Biomass Indicies",
                card_body(tags$div("These biomass indicies are design-based and may be calculated differently among science centers.", 
-                                  tags$strong("Some years of biomass estimations may be missing between surveys."),
+                                  tags$strong("Not all surveys have yearly biomass estimates."),
                                   "To compare standardized biomass estimations or view them individually, select 'All Regions' for an additional survey menu. See 'About the Data' in the 'Home' tab for more information on these survey areas."))))),
              
              uiOutput("dbiPlotUI"), #dynamic height
