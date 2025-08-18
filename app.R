@@ -178,7 +178,7 @@ ui <- page_sidebar(
                card_body(
                  tags$p("When", 
                  tags$strong("'All Regions'"),
-                 " is selected, only standardized biomass indicies are shown and can be viewed for multiple survey areas. See 'About the Data' in the 'Home' tab for more information on these survey areas." ))) )),
+                 " is selected, only standardized biomass indices are shown and can be viewed for multiple survey areas. See 'About the Data' in the 'Home' tab for more information on these survey areas." ))) )),
              conditionalPanel( #only show card when all regions NOT selected
                condition = "input.region != 'All regions'",
                accordion(
