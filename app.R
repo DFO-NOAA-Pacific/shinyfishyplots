@@ -56,6 +56,32 @@ spp_list <- list(
 ui <- page_sidebar(
   title = "Coastwide fishery synopsis",
   sidebar_width = 2,
+  tags$style(
+  # format collabsible cards
+  HTML("
+  .accordion-item {
+    border: 1px solid #ddd;
+    border-radius: 12px !important;
+    margin-bottom: 10px;
+    overflow: hidden; 
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  .accordion-button {
+    background-color: white !important;
+    color: black !important;
+    border-radius: 12px 12px 0 0 !important;
+  }
+  .accordion-button:not(.collapsed) {
+    background-color: white !important;
+    color: black !important;
+    border-radius: 12px 12px 0 0 !important;
+  }
+  .accordion-body {
+    background-color: white;
+    border-radius: 0 0 12px 12px !important;
+  }
+")),
+  
   sidebar = sidebar(
     helpText("Plots from NOAA and DFO survey data."),
     radioButtons(
