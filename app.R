@@ -187,7 +187,7 @@ ui <- page_sidebar(
                    title = "Design-Based Biomass Indicies",
                card_body(tags$div("These biomass indicies are design-based and may be calculated differently among science centers.", 
                                   tags$strong("Not all surveys have yearly biomass estimates."),
-                                  "To compare standardized biomass estimations or view them individually, select 'All Regions' for an additional survey menu. See 'About the Data' in the 'Home' tab for more information on these survey areas."))))),
+                                  " Indices were standardized by dividing each survey’s values by its mean, setting the mean to 1. To compare standardized biomass estimations or view them individually, select 'All Regions' for an additional survey menu. See 'About the Data' in the 'Home' tab for more information on these survey areas."))))),
              
              uiOutput("dbiPlotUI"), #dynamic height
              downloadButton("downloadBiomass", "Download Biomass Plot"),
