@@ -8,11 +8,11 @@ library(ggplot2)
 library(dplyr)
 library(patchwork)
 
-#### Data ####
+##### Data #####
 
 # Load biological data
 data(nwfsc_bio)
-nwfsc_bio <- nwfsc_bio %>%  filter(!common_name == "walleye pollock")
+nwfsc_bio <- nwfsc_bio %>%  filter(!common_name == "walleye pollock") #only one walleye, breaks some functions
 data(afsc_bio)
 data(pbs_bio)
 akbsai <- afsc_bio |> filter(survey == "AK BSAI")
@@ -52,12 +52,13 @@ spp_list <- list(
   "All regions" = sort(overlap)
 )
 
-#### Define User Interface ####
+##### Define User Interface #####
 ui <- page_sidebar(
+  #### Sidebar + Formatting ####
   title = "Coastwide fishery synopsis",
   sidebar_width = 2,
   tags$style(
-  # format collabsible cards
+  # format collapsible cards
   HTML("
   .accordion-item {
     border: 1px solid #ddd;
@@ -95,15 +96,16 @@ ui <- page_sidebar(
       label = "Choose a species",
       choices = NULL
     ),
-    conditionalPanel( # show when All regions is selected for biomass plots
+    conditionalPanel( # show additional selection menu for biomass plots when 'All regions' is selected 
       condition = "input.region == 'All regions' && input.tabs == 'Biomass'",
       checkboxGroupInput(
         inputId = "surveys_selected",
         label = "Select surveys (Biomass only)",
-        choices = c("U.S. West Coast", "SYN HS", "SYN QCS", "SYN WCHG", "SYN WCVI", "Gulf of Alaska" = "U.S. Gulf of Alaska", "Aleutian Islands" = "U.S. Aleutian Islands", "Eastern Bering Slope" = "U.S. Eastern Bering Sea Slope", "Eastern Bering and NW" = "U.S. Eastern Bering Sea Standard Plus NW Region", "Northern Bering" = "U.S. Northern Bering Sea")
+        choices = c("U.S. West Coast", "SYN HS", "SYN QCS", "SYN WCHG", "SYN WCVI", "Gulf of Alaska" = "U.S. Gulf of Alaska", "Aleutian Islands" = "U.S. Aleutian Islands", "Eastern Bering Slope" = "U.S. Eastern Bering Sea Slope", "Eastern Bering and NW" = "U.S. Eastern Bering Sea Standard Plus NW Region", "Northern Bering" = "U.S. Northern Bering Sea") #shorten the survey names
       )
     )
   ),
+  #### Home tab  ####
   tabsetPanel(
     id = "tabs",
     tabPanel("Home",
@@ -194,6 +196,7 @@ ui <- page_sidebar(
                   ))
              ),
     
+  #### Biomass tab ####
     tabPanel("Biomass",
              conditionalPanel( #only show card when all regions selected
                condition = "input.region == 'All regions'",
@@ -218,8 +221,10 @@ ui <- page_sidebar(
              uiOutput("dbiPlotUI"), #dynamic height
              downloadButton("downloadBiomass", "Download Biomass Plot"),
              downloadButton("downloadStanBiomass", "Download Standardized Biomass Plot")), 
+  
+  #### Age and Length tab ####
     tabPanel("Age and length",
-             uiOutput("dynamic_agelength"),
+             uiOutput("dynamic_agelength"), #object containing all plots 
              card(
                full_screen = FALSE,
                card_header("Model Info"),
@@ -231,6 +236,7 @@ ui <- page_sidebar(
              downloadButton("downloadLTS", "Download average lengths plot"),
              downloadButton("downloadAgeFreq", "Download age frequency plot"),
              downloadButton("downloadLengthFreq", "Download length frequency plot")),
+  #### Maps tab ####
     tabPanel("Maps",
              accordion(
                open = NULL,
@@ -247,17 +253,19 @@ ui <- page_sidebar(
              )),
              uiOutput("dynamicMap"), #dynamic height
              downloadButton("downloadMapPlot", "Download map")),
+  #### Depth tab ####
     tabPanel("Depth",
              uiOutput("dynamic_depth"),
              downloadButton("downloadAgeDepthPlot", "Download age-depth plot"),
              downloadButton("downloadLengthDepthPlot", "Download length-depth plot")),
+  #### Data tab ####
     tabPanel("Data",
              accordion(
                open = NULL,
                accordion_panel(
                  title = "Sampling Overview",
                card_body("These plots display the number of biological measurements taken and tow effort for selected regions and species. 'Unread Ages' are the number of fishes with age structures collected but not analysed. For completely unrounded counts, use the data download below. "))),
-             div(style = "overflow-x: scroll; min-width: 1200px;",
+             div(style = "overflow-x: scroll; min-width: 1200px;", #scrollable window
                  plotOutput("surveytable")),
              downloadButton("downloadSurveyTable", "Download Survey Plot"),
              downloadButton("downloadSurveyTibble", "Download Survey Plot Data (Unrounded Counts)"),
@@ -282,15 +290,14 @@ ui <- page_sidebar(
   )
 )
 
-#### Define Server ####
+##### Define Server #####
 server <- function(input, output, session) {
-  
+  #### species selection ####
   # Dynamic species selection based on region
   region_names <- reactive({
     switch(input$region,
            "US West Coast" = "NWFSC", "Canada" = "PBS", "Aleutians/Bering Sea" = "AK BSAI", "Gulf of Alaska" = "AK GULF", "All regions" = c("AK BSAI", "AK GULF", "PBS", "NWFSC"))
   })
-  
   observeEvent(input$region, {
   region_species <- spp_list[[input$region]]
 
@@ -311,6 +318,7 @@ server <- function(input, output, session) {
   )
   })
   
+  #### Data Downloads ####
   # Dynamic subsetting for downloading data
   bio_subset <- reactive({
     all_data <- all_data |> select(-otosag_id)
@@ -330,7 +338,7 @@ server <- function(input, output, session) {
     subset(all.dbi, common_name == input$species & survey_group %in% region_names())
   })
   
-  # Map plots
+  #### Map plots and downloads ####
   map_height1 <- reactive({
     if (setequal(region_names(), c("AK BSAI", "AK GULF", "PBS", "NWFSC"))) {
       "1800px"
@@ -368,7 +376,7 @@ server <- function(input, output, session) {
     filename = function() {paste0("map_", input$species, ".png")},
     content = function(file) {ggsave(file, plot = fishmap(predictions, region_names(), input$species), height = map_height2(), device = "png")})
   
-  # Length, age, growth plots 
+  #### length, age, growth plots and downloads ####
   output$dynamic_agelength <- renderUI({
     width <- if (identical(region_names(), c("AK BSAI", "AK GULF", "PBS", "NWFSC"))) "100%" else "65%"
     plotOutput("agelengthPlot", width = width, height = "1250px")})
@@ -417,7 +425,7 @@ server <- function(input, output, session) {
     filename = function() {paste0("lengthfrequency_plot_", input$species, ".png")},
     content = function(file) {ggsave(file, plot = length_frequency(all_data, region_names(), input$species, time_series = TRUE), width = plot_width(), device = "png")})
   
-  # Depth plot
+  #### depth plots and downloads ####
   output$dynamic_depth <- renderUI({
     width <- if (identical(region_names(), c("AK BSAI", "AK GULF", "PBS", "NWFSC"))) "100%" else "80%"
     tagList(plotOutput("age_depthPlot", width = width, height = "600px"),
@@ -439,7 +447,7 @@ server <- function(input, output, session) {
     filename = function() {paste0("length_depth_plot_", input$species, ".png")},
     content = function(file) {ggsave(file, plot = plot_length_depth(all_data, region_names(), input$species), width = plot_width(), device = "png")})
   
-  # DBI Biomass plots
+  #### Biomass plots and downloads ####
   output$dbiPlotUI <- renderUI({
     if (input$region == "All regions") {
       plotOutput("dbiPlot", height = "500px")  # smaller for All regions, only one plot
@@ -482,9 +490,10 @@ server <- function(input, output, session) {
     region_data <- all.dbi %>%
       filter(common_name == input$species, survey_group == region_names())
     
-      validate(
+      validate( #message if no data
         need(nrow(region_data) > 0,
              paste("No biomass data for", input$species, "in selected region")))
+      # normal output
     pdbi1 <- plot_dbi(input$species, region_names())
     pdbi2 <- plot_stan_dbi(input$species, region_names())
     pdbi1 + pdbi2 + plot_layout(ncol = 1)
@@ -524,13 +533,13 @@ server <- function(input, output, session) {
   })
   
   
-  # Download data tab
+ #### Data plots and downloads ####
   # Survey table
   output$surveytable <- renderPlot({
     req(!(input$species %in% c("None selected", "")))
     survey_table(all_data %>% filter(survey %in% region_names()), input$species, form = 2)
   }, width = 1200,  height = function() {
-    275 * length(region_names()) #dynamically change plot size based on amount
+    275 * length(region_names()) #dynamically change plot size based on how many are plotted
   })
   observeEvent(
   output$downloadSurveyTable <- downloadHandler(
@@ -579,7 +588,7 @@ server <- function(input, output, session) {
   
 }
 
-#### Run Shiny app ####
+#### Run Shiny app! ####
 shinyApp(ui = ui, server = server)
 
 
