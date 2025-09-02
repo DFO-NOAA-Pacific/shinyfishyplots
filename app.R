@@ -8,6 +8,7 @@ library(ggplot2)
 library(dplyr)
 library(patchwork)
 
+
 ##### Data #####
 
 # Load biological data
@@ -352,11 +353,17 @@ server <- function(input, output, session) {
   })
   
   output$dynamicMap <- renderUI({
+    validate( #message for none selected
+      need(input$species != "" && input$species != "None selected",
+           paste("Choose a species")))
     req(input$species != "None selected")
     plotOutput("modelPlot", height = map_height1())
     })
   
   output$modelPlot <- renderPlot({
+    validate( #message for none selected
+      need(input$species != "" && input$species != "None selected",
+           paste("Choose a species")))
     req(input$species != "None selected")
     fishmap(predictions, region_names(), input$species)})
   
@@ -382,6 +389,9 @@ server <- function(input, output, session) {
     plotOutput("agelengthPlot", width = width, height = "1250px")})
   
   output$agelengthPlot <- renderPlot({
+    validate( #message for none selected
+      need(input$species != "" && input$species != "None selected",
+           paste("Choose a species")))
     req(input$species != c("None selected", ""))
     # Growth plot
     p1 <- plot_growth(all_data, vb_predictions, region_names(), input$species) 
@@ -427,15 +437,24 @@ server <- function(input, output, session) {
   
   #### depth plots and downloads ####
   output$dynamic_depth <- renderUI({
+    validate( #message for none selected
+      need(input$species != "" && input$species != "None selected",
+           paste("Choose a species")))
     width <- if (identical(region_names(), c("AK BSAI", "AK GULF", "PBS", "NWFSC"))) "100%" else "80%"
     tagList(plotOutput("age_depthPlot", width = width, height = "600px"),
     plotOutput("length_depthPlot", width = width, height = "600px")) })
   
   output$age_depthPlot <- renderPlot({
+    validate( #message for none selected
+      need(input$species != "" && input$species != "None selected",
+           paste("Choose a species")))
     req(input$species != "None selected")
     plot_age_depth(all_data, region_names(), input$species)})
   
   output$length_depthPlot <- renderPlot({
+    validate( #message for none selected
+      need(input$species != "" && input$species != "None selected",
+           paste("Choose a species")))
     req(input$species != "None selected")
     plot_length_depth(all_data, region_names(), input$species)})
   
@@ -457,12 +476,17 @@ server <- function(input, output, session) {
   })
   
   output$dbiPlot <- renderPlot({
-    validate(
-      need(input$species != "" && input$species != "None selected", "Please select a species."))
-     
+    if (input$region == "All regions") { # messages for no region or species in all regions
+      validate(
+        need(!is.null(input$surveys_selected) && length(input$surveys_selected) > 0,
+             "Choose survey(s)"),
+        need(input$species != "" && input$species != "None selected",
+             paste("Choose a species")))
     
-  if (input$region == "All regions") {
-    req(input$surveys_selected, input$species != "None selected")
+    validate( #message for none selected
+      need(input$species != "" && input$species != "None selected",
+           paste("Choose a species")))
+  
     
       #create message if there is no DBI data for all selected surveys
     valid_dbi_surveys <- all_dbi %>% 
@@ -487,12 +511,17 @@ server <- function(input, output, session) {
     
     
   } else {
+
+    validate( #message if no data
+      need(input$species != "" && input$species != "None selected",
+           paste("Choose a species")))
+    
     region_data <- all_dbi %>%
       filter(common_name == input$species, survey_group == region_names())
     
       validate( #message if no data
         need(nrow(region_data) > 0,
-             paste("No biomass data for", input$species, "in selected region")))
+             paste("No biomass data for", input$species, "in this region. Please select a different species or region.")))
       # normal output
     pdbi1 <- plot_dbi(input$species, region_names())
     pdbi2 <- plot_stan_dbi(input$species, region_names())
@@ -536,6 +565,9 @@ server <- function(input, output, session) {
  #### Data plots and downloads ####
   # Survey table
   output$surveytable <- renderPlot({
+    validate( #message for none selected
+      need(input$species != "" && input$species != "None selected",
+           paste("Choose a species")))
     req(!(input$species %in% c("None selected", "")))
     survey_table(all_data %>% filter(survey %in% region_names()), input$species, form = 2)
   }, width = 1200,  height = function() {
