@@ -3,7 +3,7 @@ library(shiny)
 library(bslib)
 library(surveyjoin)
 library(sdmTMB)
-library(fishyplots) #devtools::install_github("DFO-NOAA-Pacific/fishyplots")
+#library(fishyplots) #devtools::install_github("DFO-NOAA-Pacific/fishyplots")
 library(ggplot2)
 library(dplyr)
 library(patchwork)
@@ -34,7 +34,7 @@ predictions <- predictions |>
   ))
 
 # Load biomass data
-data("all.dbi")
+data("all_dbi")
 
 # Define overlap species
 overlap <- all_data |>
@@ -121,7 +121,7 @@ ui <- page_sidebar(
                full_screen = FALSE,
                card_header("About the data"),
                card_body(
-                 tags$p("Our data comes from trawl surveys conducted by NOAA's Alaska Fisheries Science Center (AFSC) and Northwest Fisheries Science Center (NWFSC), and Fisheries and Oceans Canada's Pacific Biological Station (PBS). 
+                 tags$p("Our data comes from trawl surveys # note fishery independent#  conducted by NOAA's Alaska Fisheries Science Center (AFSC) and Northwest Fisheries Science Center (NWFSC), and Fisheries and Oceans Canada's Pacific Biological Station (PBS). 
                         For each survey region (U.S. West Coast, British Columbia, Alaska), we identified the top 20 species with respect to total biomass in all survey years. 
                         We also added the top 20 species that have been ranked as occurring in multiple areas, as part of the ",
                         HTML(' <a href = "https://doi.org/10.5281/zenodo.10031852" target = "_self" >surveyjoin</a> package.'),
@@ -335,7 +335,7 @@ server <- function(input, output, session) {
     subset(lw_predictions, common_name == input$species & survey %in% region_names())
   })
   dbi_subset <- reactive({
-    subset(all.dbi, common_name == input$species & survey_group %in% region_names())
+    subset(all_dbi, common_name == input$species & survey_group %in% region_names())
   })
   
   #### Map plots and downloads ####
@@ -465,7 +465,7 @@ server <- function(input, output, session) {
     req(input$surveys_selected, input$species != "None selected")
     
       #create message if there is no DBI data for all selected surveys
-    valid_dbi_surveys <- all.dbi %>% 
+    valid_dbi_surveys <- all_dbi %>% 
       filter(common_name == input$species, survey %in% input$surveys_selected)
     valid_dbi_surveys <-  unique(valid_dbi_surveys$survey)
     invalid_dbi_surveys <- setdiff(input$surveys_selected, valid_dbi_surveys)
@@ -487,7 +487,7 @@ server <- function(input, output, session) {
     
     
   } else {
-    region_data <- all.dbi %>%
+    region_data <- all_dbi %>%
       filter(common_name == input$species, survey_group == region_names())
     
       validate( #message if no data
@@ -506,7 +506,7 @@ server <- function(input, output, session) {
     req(input$surveys_selected)
     
     #create message if there is no DBI data for all selected surveys
-    valid_dbi_surveys <- all.dbi %>% 
+    valid_dbi_surveys <- all_dbi %>% 
       filter(common_name == input$species, survey %in% input$surveys_selected)
     valid_dbi_surveys <-  unique(valid_dbi_surveys$survey)
     invalid_dbi_surveys <- setdiff(input$surveys_selected, valid_dbi_surveys)
