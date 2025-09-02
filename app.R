@@ -37,20 +37,30 @@ predictions <- predictions |>
 # Load biomass data
 data("all_dbi")
 
-# Define overlap species
-overlap <- all_data |>
-  distinct(common_name, region) |>
-  count(common_name, name = "n") |>
-  filter(n >= 2) |>
-  pull(common_name)
+#### below code for only species with data available in region
+# # Define overlap species
+# overlap <- all_data |>
+#   distinct(common_name, region) |>
+#   count(common_name, name = "n") |>
+#   filter(n >= 2) |>
+#   pull(common_name)
 
 # Create species list for each region
+# spp_list <- list(
+#   "Aleutians/Bering Sea" = sort(unique(akbsai$common_name)),
+#   "Gulf of Alaska" = sort(unique(akgulf$common_name)),
+#   "US West Coast" = sort(unique(nwfsc_bio$common_name)),
+#   "Canada" = sort(unique(pbs_bio$common_name)),
+#   "All regions" = sort(overlap)
+# )
+
+# species list for region selections (all the same)
 spp_list <- list(
-  "Aleutians/Bering Sea" = sort(unique(akbsai$common_name)),
-  "Gulf of Alaska" = sort(unique(akgulf$common_name)),
-  "US West Coast" = sort(unique(nwfsc_bio$common_name)),
-  "Canada" = sort(unique(pbs_bio$common_name)),
-  "All regions" = sort(overlap)
+"Aleutians/Bering Sea" = sort(unique(all_data$common_name)),
+"Gulf of Alaska" = sort(unique(all_data$common_name)),
+"US West Coast" = sort(unique(all_data$common_name)),
+"Canada" = sort(unique(all_data$common_name)),
+"All regions" = sort(unique(all_data$common_name))
 )
 
 ##### Define User Interface #####
@@ -115,14 +125,13 @@ ui <- page_sidebar(
                card_header("About this tool"),
                card_body(
                  tags$p("Welcome! This interactive app serves as a coastwide synopsis of fisheries in the northeast Pacific Ocean,
-                   providing information on fish biology, predicted spatial distributions, and biomass. We hope this tool will be used by stakeholders at NOAA 
-                   and DFO to support monitoring and management of marine ecosystems and resources.")
+                   providing information on fish biology, predicted spatial distributions, and biomass. This tool is intended to support managers, scientists, collaborators, and others to explore available data for monitoring and management of marine ecosystems and resources.")
                ) ),
              card(
                full_screen = FALSE,
                card_header("About the data"),
                card_body(
-                 tags$p("Our data comes from trawl surveys # note fishery independent#  conducted by NOAA's Alaska Fisheries Science Center (AFSC) and Northwest Fisheries Science Center (NWFSC), and Fisheries and Oceans Canada's Pacific Biological Station (PBS). 
+                 tags$p("Our data come from fishery-independent trawl surveys conducted by the National Oceanic and Atmospheric Administration (NOAA) and Fisheries and Oceans Canada (DFO), compiled from NOAA's Alaska Fisheries Science Center (AFSC) and Northwest Fisheries Science Center (NWFSC), and DFO's Pacific Biological Station (PBS). 
                         For each survey region (U.S. West Coast, British Columbia, Alaska), we identified the top 20 species with respect to total biomass in all survey years. 
                         We also added the top 20 species that have been ranked as occurring in multiple areas, as part of the ",
                         HTML(' <a href = "https://doi.org/10.5281/zenodo.10031852" target = "_self" >surveyjoin</a> package.'),
@@ -139,10 +148,10 @@ ui <- page_sidebar(
                    tags$div(style = "margin-left: 1em;", "Gulf of Alaska"),
                    tags$br(),
                    tags$strong("Canada (PBS):"), tags$br(),
-                   tags$div(style = "margin-left: 1em;", "SYN HS (Synoptic Hecate Strait)"),
-                   tags$div(style = "margin-left: 1em;", "SYN QCS (Synoptic Queen Charlotte Sound)"),
-                   tags$div(style = "margin-left: 1em;", "SYN WCHG (Synoptic West Coast Vancouver Island)"),
-                   tags$div(style = "margin-left: 1em;", "SYN WCVI (Synoptic West Coast Haida Gwaii)"),
+                   tags$div(style = "margin-left: 1em;", "Synoptic Hecate Strait (SYN HS)"),
+                   tags$div(style = "margin-left: 1em;", "Synoptic Queen Charlotte Sound (SYN QCS)"),
+                   tags$div(style = "margin-left: 1em;", "Synoptic West Coast Vancouver Island (SYN WCHG)"),
+                   tags$div(style = "margin-left: 1em;", "Synoptic West Coast Haida Gwaii (SYN WCVI)"),
                    tags$br(),
                    tags$strong("US West Coast (NWFSC):"), tags$br(),
                    tags$div(style = "margin-left: 1em;", "U.S. West Coast")
