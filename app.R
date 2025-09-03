@@ -7,6 +7,7 @@ library(sdmTMB)
 library(ggplot2)
 library(dplyr)
 library(patchwork)
+library(shinycssloaders)
 
 
 ##### Data #####
@@ -66,11 +67,36 @@ spp_list <- list(
 ##### Define User Interface #####
 ui <- page_sidebar(
   #### Sidebar + Formatting ####
-  title = "Coastwide fishery synopsis",
+  title = div(
+    "Pacific Survey Explorer",
+    style = "background-color:#2C3E79; color:white; font-weight:bold; 
+             padding:12px; font-size:1.5em;"
+  ),
   sidebar_width = 2,
+  
+  theme = bs_theme(
+    bg = "#FFF",
+    fg = "#101010",
+    primary = "#2C3E79",
+    secondary = "#2C3E79"),
   tags$style(
-  # format collapsible cards
+  
   HTML("
+   .sidebar {
+      background-color: #d8d8d8 !important;
+      color: black !important;
+      padding: 15px;
+   }
+  /* Inactive tabs */
+.nav-tabs .nav-link {
+  color: #2C3E79 !important;  /* blue */
+}
+
+/* Active tab */
+.nav-tabs .nav-link.active {
+  color: #D9B15C !important; 
+}
+  /* format collapsible cards */
   .accordion-item {
     border: 1px solid #ddd;
     border-radius: 12px !important;
@@ -79,12 +105,12 @@ ui <- page_sidebar(
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   }
   .accordion-button {
-    background-color: white !important;
+    background-color: #d7d7d7 !important;
     color: black !important;
     border-radius: 12px 12px 0 0 !important;
   }
   .accordion-button:not(.collapsed) {
-    background-color: white !important;
+    background-color: #d7d7d7 !important;
     color: black !important;
     border-radius: 12px 12px 0 0 !important;
   }
@@ -95,7 +121,8 @@ ui <- page_sidebar(
 ")),
   
   sidebar = sidebar(
-    helpText("Plots from NOAA and DFO survey data."),
+    div("A tool to visualize data from NOAA and DFO surveys.",
+        style = "font-size:16px; color:black;"),
     radioButtons(
       inputId = "region",
       label = "Choose a region",
@@ -122,17 +149,19 @@ ui <- page_sidebar(
     tabPanel("Home",
              card(
                full_screen = FALSE,
-               card_header("About this tool"),
+               card_header("About this tool", style = "background-color: #d7d7d7;"),
                card_body(
-                 tags$p("Welcome! This interactive app serves as a coastwide synopsis of fisheries in the northeast Pacific Ocean,
+                 tags$p(tags$strong("Welcome!"),"This interactive app serves as a coastwide synopsis of fisheries in the northeast Pacific Ocean,
                    providing information on fish biology, predicted spatial distributions, and biomass. This tool is intended to support managers, scientists, collaborators, and others to explore available data for monitoring and management of marine ecosystems and resources.")
                ) ),
              card(
                full_screen = FALSE,
-               card_header("About the data"),
+               card_header("About the data", style = "background-color: #d7d7d7;"),
                card_body(
-                 tags$p("Our data come from fishery-independent trawl surveys conducted by the National Oceanic and Atmospheric Administration (NOAA) and Fisheries and Oceans Canada (DFO), compiled from NOAA's Alaska Fisheries Science Center (AFSC) and Northwest Fisheries Science Center (NWFSC), and DFO's Pacific Biological Station (PBS). 
-                        For each survey region (U.S. West Coast, British Columbia, Alaska), we identified the top 20 species with respect to total biomass in all survey years. 
+                 tags$p("Our data come from", tags$strong("fishery-independent trawl surveys "),
+                 "conducted by the ",tags$strong("National Oceanic and Atmospheric Administration (NOAA) "),
+                 "and ", tags$strong("Fisheries and Oceans Canada (DFO)"),", compiled from NOAA's Alaska Fisheries Science Center (AFSC) and Northwest Fisheries Science Center (NWFSC), and DFO's Pacific Biological Station (PBS).
+                 For each survey region (U.S. West Coast, British Columbia, Alaska), we identified the top 20 species with respect to total biomass in all survey years. 
                         We also added the top 20 species that have been ranked as occurring in multiple areas, as part of the ",
                         HTML(' <a href = "https://doi.org/10.5281/zenodo.10031852" target = "_self" >surveyjoin</a> package.'),
                  "See citations for more information on the surveys and data collection."),
@@ -160,7 +189,7 @@ ui <- page_sidebar(
              ),
              card(
                full_screen = FALSE,
-               card_header("Code and Acknowledgements"),
+               card_header("Code and Acknowledgements", style = "background-color: #d7d7d7;"),
                card_body(
                  tags$p("This app uses plotting functions from the ",
                         tags$a(href = "https://doi.org/10.5281/zenodo.15932836", "fishyplots", target = "_self"), 
@@ -173,14 +202,14 @@ ui <- page_sidebar(
                )),
              card(
                full_screen = FALSE,
-               card_header("Feedback"),
+               card_header("Feedback", style = "background-color: #d7d7d7;"),
                card_body(
                  tags$p("Have a question or found a bug? Please ", 
                         HTML(' <a href = "https://github.com/DFO-NOAA-Pacific/shinyfishyplots/issues" target = "_self" >report here</a>.')
                  )
                )),
              card(full_screen = FALSE,
-                  card_header("Citations"),
+                  card_header("Citations", style = "background-color: #d7d7d7;"),
                   card_body(
                       tags$strong("Aleutians Islands Bottom Trawl Survey"),
                       tags$ul(tags$li("Von Szalay PG, Raring NW, Siple MC, Dowlin AN, Riggle BC, and Laman EA. 2023. Data Report: 2022 Aleutian Islands bottom trawl survey. U.S. Dep. Commer. DOI: 10.25923/85cy-g225.")),
@@ -228,16 +257,16 @@ ui <- page_sidebar(
                                   tags$strong("Not all surveys have yearly biomass estimates."),
                                   " Indices were standardized by dividing each survey’s values by its mean, setting the mean to 1. To compare standardized biomass estimations or view them individually, select 'All Regions' for an additional survey menu. See 'About the Data' in the 'Home' tab for more information on these survey areas."))))),
              
-             uiOutput("dbiPlotUI"), #dynamic height
+             withSpinner(uiOutput("dbiPlotUI"), type = 3, size = 2, color.background = "#FFFFFFD0"), #dynamic height
              downloadButton("downloadBiomass", "Download Biomass Plot"),
              downloadButton("downloadStanBiomass", "Download Standardized Biomass Plot")), 
   
   #### Age and Length tab ####
     tabPanel("Age and length",
-             uiOutput("dynamic_agelength"), #object containing all plots 
+             withSpinner(uiOutput("dynamic_agelength"), type = 3, size = 2, color.background = "#FFFFFFD0"), #object containing all plots 
              card(
                full_screen = FALSE,
-               card_header("Model Info"),
+               card_header("Model Info", style = "background-color: #d7d7d7;"),
                card_body(tags$div(tags$strong("Growth:"),"Von-Bertalanffy growth curve"),
                          tags$div(tags$strong("Length-Weight:"), "Log-log regression"),
                          tags$div("See 'Data' tab to download biological and prediction datasets used in these plots."))),
@@ -261,11 +290,11 @@ ui <- page_sidebar(
                 These maps are exploratory and should not be used as definitive sources for management decisions.")
                )
              )),
-             uiOutput("dynamicMap"), #dynamic height
+             withSpinner(uiOutput("dynamicMap"), type = 3, size = 2, color.background = "#FFFFFFD0"), #dynamic height
              downloadButton("downloadMapPlot", "Download map")),
   #### Depth tab ####
     tabPanel("Depth",
-             uiOutput("dynamic_depth"),
+             withSpinner(uiOutput("dynamic_depth"), type = 3, size = 2, color.background = "#FFFFFFD0"),
              downloadButton("downloadAgeDepthPlot", "Download age-depth plot"),
              downloadButton("downloadLengthDepthPlot", "Download length-depth plot")),
   #### Data tab ####
@@ -276,13 +305,13 @@ ui <- page_sidebar(
                  title = "Sampling Overview",
                card_body("These plots display the number of biological measurements taken and tow effort for selected regions and species. 'Unread Ages' are the number of fishes with age structures collected but not analysed. For completely unrounded counts, use the data download below. "))),
              div(style = "overflow-x: scroll; min-width: 1200px;", #scrollable window
-                 plotOutput("surveytable")),
+                 withSpinner(plotOutput("surveytable"), type = 3, size = 2, color.background = "#FFFFFFD0")),
              downloadButton("downloadSurveyTable", "Download Survey Plot"),
              downloadButton("downloadSurveyTibble", "Download Survey Plot Data (Unrounded Counts)"),
              tags$div(Style = "margin-top: 50px;"),
              card(
                full_screen = FALSE,
-               card_header("Data download options for selected region and species")),
+               card_header("Data download options for selected region and species", style = "background-color: #d7d7d7;")),
              tableOutput("demotable"),
              downloadButton("downloadbio", "Download biological data"),
              tags$div(Style = "margin-top: 50px;"),
