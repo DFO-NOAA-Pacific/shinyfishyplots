@@ -14,7 +14,7 @@ library(shinycssloaders)
 
 # Load biological data
 data(nwfsc_bio)
-nwfsc_bio <- nwfsc_bio %>%  filter(!common_name == "walleye pollock") #only one walleye, breaks some functions
+nwfsc_bio <- nwfsc_bio |>  filter(!common_name == "walleye pollock") #only one walleye, breaks some functions
 data(afsc_bio)
 data(pbs_bio)
 akbsai <- afsc_bio |> filter(survey == "AK BSAI")
@@ -88,14 +88,15 @@ ui <- page_sidebar(
       padding: 15px;
    }
   /* Inactive tabs */
-.nav-tabs .nav-link {
+  .nav-tabs .nav-link {
   color: #2C3E79 !important;  /* blue */
-}
-
-/* Active tab */
-.nav-tabs .nav-link.active {
+  }
+  
+  /* Active tab */
+  .nav-tabs .nav-link.active {
   color: #D9B15C !important; 
-}
+  }
+  
   /* format collapsible cards */
   .accordion-item {
     border: 1px solid #ddd;
@@ -118,7 +119,7 @@ ui <- page_sidebar(
     background-color: white;
     border-radius: 0 0 12px 12px !important;
   }
-")),
+    ")),
   
   sidebar = sidebar(
     div("A tool to visualize data from NOAA and DFO surveys.",
@@ -432,11 +433,11 @@ server <- function(input, output, session) {
            paste("Choose a species")))
     req(input$species != c("None selected", ""))
     # Growth plot
-    p1 <- plot_growth(all_data, vb_predictions, region_names(), input$species) 
+    p1 <- plot_growth(all_data, region_names(), input$species) 
     # Length - weight
-    p2 <- length_weight(subset(all_data, survey %in% region_names()), input$species, subset = TRUE)
+    p2 <- length_weight(all_data, region_names(), input$species, subset = TRUE)
     # Average Lengths
-    p3 <- length_ts(subset(all_data, survey %in% region_names()), input$species)
+    p3 <- length_ts(all_data, region_names(), input$species)
     # Age frequency
     p4 <- age_frequency(all_data, region_names(), input$species, cutoff = 0.75)
     # Length frequency
@@ -455,15 +456,15 @@ server <- function(input, output, session) {
   
   output$downloadGrowth <- downloadHandler(
     filename = function() {paste0("growth_plot_", input$species, ".png")},
-    content = function(file) {ggsave(file, plot = plot_growth(all_data, vb_predictions, region_names(), input$species), width = plot_width(), device = "png")})
+    content = function(file) {ggsave(file, plot = plot_growth(all_data, region_names(), input$species), width = plot_width(), device = "png")})
   
   output$downloadLW <- downloadHandler(
     filename = function() {paste0("lw_plot_", input$species, ".png")},
-    content = function(file) {ggsave(file, plot = length_weight(subset(all_data, survey %in% region_names()), input$species, subset = TRUE), width = plot_width(), device = "png")})
+    content = function(file) {ggsave(file, plot = length_weight(all_data, region_names(), input$species, subset = TRUE), width = plot_width(), device = "png")})
   
   output$downloadLTS <- downloadHandler(
     filename = function() {paste0("avglengths_plot_", input$species, ".png")},
-    content = function(file) {ggsave(file, plot = length_ts(subset(all_data, survey %in% region_names()), input$species), width = plot_width(), device = "png")})
+    content = function(file) {ggsave(file, plot = length_ts(all_data, region_names(), input$species), width = plot_width(), device = "png")})
   
   output$downloadAgeFreq <- downloadHandler(
     filename = function() {paste0("agefrequency_plot_", input$species, ".png")},
@@ -527,7 +528,7 @@ server <- function(input, output, session) {
   
     
       #create message if there is no DBI data for all selected surveys
-    valid_dbi_surveys <- all_dbi %>% 
+    valid_dbi_surveys <- all_dbi |> 
       filter(common_name == input$species, survey %in% input$surveys_selected)
     valid_dbi_surveys <-  unique(valid_dbi_surveys$survey)
     invalid_dbi_surveys <- setdiff(input$surveys_selected, valid_dbi_surveys)
@@ -554,7 +555,7 @@ server <- function(input, output, session) {
       need(input$species != "" && input$species != "None selected",
            paste("Choose a species")))
     
-    region_data <- all_dbi %>%
+    region_data <- all_dbi |>
       filter(common_name == input$species, survey_group == region_names())
     
       validate( #message if no data
@@ -573,7 +574,7 @@ server <- function(input, output, session) {
     req(input$surveys_selected)
     
     #create message if there is no DBI data for all selected surveys
-    valid_dbi_surveys <- all_dbi %>% 
+    valid_dbi_surveys <- all_dbi |> 
       filter(common_name == input$species, survey %in% input$surveys_selected)
     valid_dbi_surveys <-  unique(valid_dbi_surveys$survey)
     invalid_dbi_surveys <- setdiff(input$surveys_selected, valid_dbi_surveys)
@@ -607,17 +608,17 @@ server <- function(input, output, session) {
       need(input$species != "" && input$species != "None selected",
            paste("Choose a species")))
     req(!(input$species %in% c("None selected", "")))
-    survey_table(all_data %>% filter(survey %in% region_names()), input$species, form = 2)
+    survey_table(all_data , region_names(), input$species, form = 2, facet_all = TRUE)
   }, width = 1200,  height = function() {
     275 * length(region_names()) #dynamically change plot size based on how many are plotted
   })
   observeEvent(
   output$downloadSurveyTable <- downloadHandler(
     filename = function() {paste0("SurveyCount_plot_", input$species, ".png")},
-    content = function(file) {ggsave(file, plot = survey_table(subset(all_data, survey == region_names()), input$species, form = 2), width = 15, device = "png")}),
+    content = function(file) {ggsave(file, plot = survey_table(all_data , region_names(), input$species, form = 2, facet_all = TRUE), width = 15, device = "png")}),
   output$downloadSurveyTibble <-  downloadHandler(
     filename = function() {paste0("SurveyCount_table_", input$species, ".csv")},
-    content = function(file) {write.csv(survey_table(subset(all_data, survey == region_names()), input$species, form = 1), file)})
+    content = function(file) {write.csv(survey_table(all_data , region_names(), input$species, form = 1), file)})
   )
   
   # Download biological data
