@@ -72,6 +72,8 @@ ui <- page_sidebar(
     style = "background-color:#2C3E79; color:white; font-weight:bold; 
              padding:12px; font-size:1.5em;"
   ),
+
+  
   sidebar_width = 2,
   
   theme = bs_theme(
@@ -121,29 +123,70 @@ ui <- page_sidebar(
   }
     ")),
   
-  sidebar = sidebar(
-    div("A tool to visualize data from NOAA and DFO surveys.",
-        style = "font-size:16px; color:black;"),
-    radioButtons(
-      inputId = "region",
-      label = "Choose a region",
-      choices = list("All regions", "Aleutians/Bering Sea", "Gulf of Alaska", "Canada", "US West Coast"),
-      selected = "All regions"
+  # Sidebar: show only if not on "Home" tab
+  sidebar = tagList(
+    
+    conditionalPanel( # default sidebar for most tabs
+      condition = "input.tabs != 'Home'",
+      div("A tool to visualize data from NOAA and DFO surveys.",
+          style = "font-size:16px; color:black;"),
+      radioButtons(
+        inputId = "region",
+        label = "Choose a region",
+        choices = list("All regions", "Aleutians/Bering Sea", "Gulf of Alaska", "Canada", "US West Coast"),
+        selected = "All regions"
+      ),
+      selectInput(
+        "species",
+        label = "Choose a species",
+        choices = NULL
+      )
     ),
-    selectInput(
-      "species",
-      label = "Choose a species",
-      choices = NULL
+    
+    conditionalPanel( # Home tab sidebar : no selections
+      condition = "input.tabs == 'Home'",
+      div("A tool to visualize data from NOAA and DFO surveys.",
+          style = "font-size:16px; color:black;"),
+      div("Select a tab to get started!",
+          style = "font-size:16px; color:black; font-weight: bold;")
     ),
-    conditionalPanel( # show additional selection menu for biomass plots when 'All regions' is selected 
+    
+    conditionalPanel( # additional selection menus for ALL REGIONS BIOMASS
       condition = "input.region == 'All regions' && input.tabs == 'Biomass'",
       checkboxGroupInput(
         inputId = "surveys_selected",
-        label = "Select surveys (Biomass only)",
-        choices = c("U.S. West Coast", "SYN HS", "SYN QCS", "SYN WCHG", "SYN WCVI", "Gulf of Alaska" = "U.S. Gulf of Alaska", "Aleutian Islands" = "U.S. Aleutian Islands", "Eastern Bering Slope" = "U.S. Eastern Bering Sea Slope", "Eastern Bering and NW" = "U.S. Eastern Bering Sea Standard Plus NW Region", "Northern Bering" = "U.S. Northern Bering Sea") #shorten the survey names
+        label = "Select surveys",
+        choices = c(
+          "U.S. West Coast", "Hectate Strait" = "SYN HS", "Queen Chatlotte Sound" = "SYN QCS", "Haida Gwaii" = "SYN WCHG", "Vancouver Island" = "SYN WCVI",
+          "Gulf of Alaska" = "U.S. Gulf of Alaska",
+          "Aleutian Islands" = "U.S. Aleutian Islands",
+          "Eastern Bering Slope" = "U.S. Eastern Bering Sea Slope",
+          "Eastern Bering and NW" = "U.S. Eastern Bering Sea Standard Plus NW Region",
+          "Northern Bering" = "U.S. Northern Bering Sea" )
       )
-    )
+    ), 
+    conditionalPanel( # additional selection menus for AK BSAI BIOMASS
+      condition = "input.region == 'Aleutians/Bering Sea' && input.tabs == 'Biomass'",
+      checkboxGroupInput(
+        inputId = "surveys_selected",
+        label = "Select surveys)",
+        choices = c(
+          "Aleutian Islands" = "U.S. Aleutian Islands",
+          "Eastern Bering Slope" = "U.S. Eastern Bering Sea Slope",
+          "Eastern Bering and NW" = "U.S. Eastern Bering Sea Standard Plus NW Region",
+          "Northern Bering" = "U.S. Northern Bering Sea")
+      )
+    ), 
+    conditionalPanel( # additional selection menus for CANADA BIOMASS
+      condition = "input.region == 'Canada' && input.tabs == 'Biomass'",
+      checkboxGroupInput(
+        inputId = "surveys_selected",
+        label = "Select surveys",
+        choices = c("Hectate Strait" = "SYN HS", "Queen Chatlotte Sound" = "SYN QCS", "Haida Gwaii" = "SYN WCHG", "Vancouver Island" = "SYN WCVI" )
+      )
+    ), 
   ),
+  
   #### Home tab  ####
   tabsetPanel(
     id = "tabs",
@@ -247,7 +290,8 @@ ui <- page_sidebar(
                card_body(
                  tags$p("When", 
                  tags$strong("'All Regions'"),
-                 " is selected, only standardized biomass indices are shown and can be viewed for multiple survey areas. Indices were standardized by dividing each survey’s values by its mean, setting the average to 1. See 'About the Data' in the 'Home' tab for information on the region/survey groupings." ))) )),
+                 " is selected, only standardized biomass indices are shown and can be viewed for multiple survey areas. Indices were standardized by dividing each survey’s values by its mean, setting the average to 1. See 'About the Data' in the 'Home' tab for information on the region/survey groupings and abbreviations." ))) )),
+
              conditionalPanel( #only show card when all regions NOT selected
                condition = "input.region != 'All regions'",
                accordion(
@@ -256,7 +300,7 @@ ui <- page_sidebar(
                    title = "Design-Based Biomass Indicies",
                card_body(tags$div("These biomass indicies are design-based and may be calculated differently among science centers.", 
                                   tags$strong("Not all surveys have yearly biomass estimates."),
-                                  " Indices were standardized by dividing each survey’s values by its mean, setting the average to 1. To compare standardized biomass estimations or view them individually, select 'All Regions' for an additional survey menu. See 'About the Data' in the 'Home' tab for information on the region/survey groupings."))))),
+                                  " Indices were standardized by dividing each survey’s values by its mean, setting the average to 1. To compare standardized biomass estimations for different regions, select 'All Regions'. See 'About the Data' in the 'Home' tab for information on the region/survey groupings and abbreviations."))))),
              
              withSpinner(uiOutput("dbiPlotUI"), type = 3, size = 2, color.background = "#FFFFFFD0"), #dynamic height
              downloadButton("downloadBiomass", "Download Biomass Plot"),
@@ -338,18 +382,15 @@ server <- function(input, output, session) {
     switch(input$region,
            "US West Coast" = "NWFSC", "Canada" = "PBS", "Aleutians/Bering Sea" = "AK BSAI", "Gulf of Alaska" = "AK GULF", "All regions" = c("AK BSAI", "AK GULF", "PBS", "NWFSC"))
   })
-  observeEvent(input$region, {
+  observeEvent(input$region, { 
   region_species <- spp_list[[input$region]]
-
   # Check if currently selected species is also present in the newly selected region:
   current_spp <- input$species
-
   if (!is.null(current_spp) && current_spp %in% region_species) {
     selected_species <- current_spp
   } else {
     selected_species <- "None selected"
   }
-
   updateSelectInput(
     session,
     "species",
@@ -357,7 +398,14 @@ server <- function(input, output, session) {
     selected = selected_species
   )
   })
-  
+  # FOR DBI SURVEY SELECTIONS
+  #reset survey selections when going to new region
+  observeEvent(input$region, {
+    updateCheckboxGroupInput(
+      session, "surveys_selected",
+      selected = character(0)) })
+
+    
   #### Data Downloads ####
   # Dynamic subsetting for downloading data
   bio_subset <- reactive({
@@ -515,17 +563,12 @@ server <- function(input, output, session) {
   })
   
   output$dbiPlot <- renderPlot({
-    if (input$region == "All regions") { # messages for no region or species in all regions
-      validate(
+    if (input$region == "All regions") { # messages for no region or species 
+      validate(#message for none selected
         need(!is.null(input$surveys_selected) && length(input$surveys_selected) > 0,
              "Choose survey(s)"),
         need(input$species != "" && input$species != "None selected",
              paste("Choose a species")))
-    
-    validate( #message for none selected
-      need(input$species != "" && input$species != "None selected",
-           paste("Choose a species")))
-  
     
       #create message if there is no DBI data for all selected surveys
     valid_dbi_surveys <- all_dbi |> 
@@ -549,22 +592,54 @@ server <- function(input, output, session) {
     plot_stan_dbi(input$species, valid_dbi_surveys) # show only standardized plot if All regions selected
     
     
-  } else {
-
-    validate( #message if no data
+  } else if (input$region == "Canada"| input$region =="Aleutians/Bering Sea") { # options for regions with multiple surveys
+    
+    validate(#message for none selected
+      need(!is.null(input$surveys_selected) && length(input$surveys_selected) > 0,
+           "Choose survey(s)"),
       need(input$species != "" && input$species != "None selected",
            paste("Choose a species")))
     
-    region_data <- all_dbi |>
-      filter(common_name == input$species, survey_group == region_names())
     
-      validate( #message if no data
-        need(nrow(region_data) > 0,
-             paste("No biomass data for", input$species, "in this region. Please select a different species or region.")))
-      # normal output
+    #create message if there is no DBI data for selected surveys
+    valid_dbi_surveys <- all_dbi |> 
+      filter(common_name == input$species, survey %in% input$surveys_selected)
+    valid_dbi_surveys <-  unique(valid_dbi_surveys$survey)
+    invalid_dbi_surveys <- setdiff(input$surveys_selected, valid_dbi_surveys)
+    
+    validate(
+      need(length(valid_dbi_surveys) > 0,
+           paste("No data for", input$species, "in selected surveys"))
+    )
+    
+    # Show a warning notif if some of selected surveys have no data
+    if (length(invalid_dbi_surveys) > 0) {
+      showNotification(
+        paste("No data for", input$species, "in:", paste(invalid_dbi_surveys, collapse = ", ")),
+        type = "warning"
+      )
+    }
+    
+    pdbi1 <- plot_dbi(input$species, input$surveys_selected)
+    pdbi2 <- plot_stan_dbi(input$species, input$surveys_selected)
+    pdbi1 + pdbi2 + plot_layout(ncol = 1) 
+  } else { #when region has one survey
+    
+    validate( #message for none selected
+      need(input$species != "" && input$species != "None selected",
+           paste("Choose a species")))
+    
+    #create message if there is no DBI data for selected surveys
+    valid_dbi_surveys <- all_dbi |> 
+      filter(common_name == input$species, survey_group %in% region_names())
+    valid_dbi_surveys <-  unique(valid_dbi_surveys$survey_group)
+    validate(
+      need(length(valid_dbi_surveys) > 0,
+           paste("No data for", input$species, "in selected region/surveys")))
+
     pdbi1 <- plot_dbi(input$species, region_names())
     pdbi2 <- plot_stan_dbi(input$species, region_names())
-    pdbi1 + pdbi2 + plot_layout(ncol = 1)
+    pdbi1 + pdbi2 + plot_layout(ncol = 1) 
   }
   })
   
@@ -572,33 +647,32 @@ server <- function(input, output, session) {
  observe(
    if (input$region == "All regions") {
     req(input$surveys_selected)
-    
     #create message if there is no DBI data for all selected surveys
     valid_dbi_surveys <- all_dbi |> 
       filter(common_name == input$species, survey %in% input$surveys_selected)
     valid_dbi_surveys <-  unique(valid_dbi_surveys$survey)
-    invalid_dbi_surveys <- setdiff(input$surveys_selected, valid_dbi_surveys)
-    
     
     # show only standardized plot if All regions selected
     output$downloadStanBiomass <- downloadHandler(
       filename = function() {paste0("stan_biomass_plots_", input$species, ".png")},
       content = function(file) {ggsave(file, plot =  plot_stan_dbi(input$species, valid_dbi_surveys), width = 10, device = "png")})
-    
-    
-  } else {
+  } else if (input$region == "Canada"| input$region =="Aleutians/Bering Sea") { # not all regions, but more than one survey
     # show normal and standardized
-    pdbi1 <- plot_dbi(input$species, region_names())
-    pdbi2 <- plot_stan_dbi(input$species, region_names())
-    pdbi1 + pdbi2 + plot_layout(ncol = 1)
-    
+    output$downloadBiomass <- downloadHandler(
+      filename = function() {paste0("biomass_plot_", input$species,"_", region_names(), ".png")},
+      content = function(file) {ggsave(file, plot =  plot_dbi(input$species, input$surveys_selected), width = 10, device = "png")})
+    output$downloadStanBiomass <- downloadHandler(
+      filename = function() {paste0("stan_biomass_plot_", input$species,"_", region_names(), ".png")},
+      content = function(file) {ggsave(file, plot =  plot_stan_dbi(input$species, input$surveys_selected), width = 10, device = "png")})
+  } else { # not all regions, only one survey per region
     output$downloadBiomass <- downloadHandler(
       filename = function() {paste0("biomass_plot_", input$species,"_", region_names(), ".png")},
       content = function(file) {ggsave(file, plot =  plot_dbi(input$species, region_names()), width = 10, device = "png")})
     output$downloadStanBiomass <- downloadHandler(
       filename = function() {paste0("stan_biomass_plot_", input$species,"_", region_names(), ".png")},
       content = function(file) {ggsave(file, plot =  plot_stan_dbi(input$species, region_names()), width = 10, device = "png")})
-  })
+  }
+  )
   
   
  #### Data plots and downloads ####
