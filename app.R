@@ -290,7 +290,8 @@ ui <- page_sidebar(
                card_body(
                  tags$p("When", 
                  tags$strong("'All Regions'"),
-                 " is selected, only standardized biomass indices are shown and can be viewed for multiple survey areas. See 'About the Data' in the 'Home' tab for abbreviations and a breakdown of regions into surveys." ))) )),
+                 " is selected, only standardized biomass indices are shown and can be viewed for multiple survey areas. Indices were standardized by dividing each survey’s values by its mean, setting the average to 1. See 'About the Data' in the 'Home' tab for information on the region/survey groupings and abbreviations." ))) )),
+
              conditionalPanel( #only show card when all regions NOT selected
                condition = "input.region != 'All regions'",
                accordion(
@@ -299,7 +300,7 @@ ui <- page_sidebar(
                    title = "Design-Based Biomass Indicies",
                card_body(tags$div("These biomass indicies are design-based and may be calculated differently among science centers.", 
                                   tags$strong("Not all surveys have yearly biomass estimates."),
-                                  " Indices were standardized by dividing each survey’s values by its mean, setting the mean to 1. To compare standardized biomass estimations or view them individually, select 'All Regions' for an additional survey menu. See 'About the Data' in the 'Home' tab for more information on these survey areas and abbreviations."))))),
+                                  " Indices were standardized by dividing each survey’s values by its mean, setting the average to 1. To compare standardized biomass estimations for different regions, select 'All Regions'. See 'About the Data' in the 'Home' tab for information on the region/survey groupings and abbreviations."))))),
              
              withSpinner(uiOutput("dbiPlotUI"), type = 3, size = 2, color.background = "#FFFFFFD0"), #dynamic height
              downloadButton("downloadBiomass", "Download Biomass Plot"),
