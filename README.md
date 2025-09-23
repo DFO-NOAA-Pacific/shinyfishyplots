@@ -1,17 +1,24 @@
 # shinyfishyplots
 
-Dependencies:
+This repository contains a Shiny app for the Pacific Groundfish Data Synopsis. It relies on plotting functions and data from the [fishyplots](https://github.com/DFO-NOAA-Pacific/fishyplots) repository.
+
+To build the Shiny app locally, first install these packages:
+
+```R
+install.packages("pak")
+pak::pak("DFO-NOAA-Pacific/fishyplots")
+
+install.packages("shiny")
+install.packages("ggplot2")
+install.packages("dplyr")
+install.packages("bslib")
+install.packages("patchwork")
+install.packages("shinycssloaders")
 ```
-# fishyplots
-devtools::install_github("DFO-NOAA-Pacific/fishyplots")
 
-# surveyjoin
-# install.packages("pak")
-pak::pkg_install("DFO-NOAA-Pacific/surveyjoin")
+Then run the app:
 
-# sdmTMB
-install.packages("sdmTMB", dependencies = TRUE)
-# Or the development version if you have a C++ compiler
-# install.packages("pak")
-pak::pak("pbs-assess/sdmTMB", dependencies = TRUE)
+```R
+source("app.R")
+shinyApp(ui = ui, server = server)
 ```
