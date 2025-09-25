@@ -207,7 +207,7 @@ ui <- page_sidebar(
                  "and ", tags$strong("Fisheries and Oceans Canada (DFO)"),", compiled from NOAA's Alaska Fisheries Science Center (AFSC) and Northwest Fisheries Science Center (NWFSC), and DFO's Pacific Biological Station (PBS).
                  For each survey region (U.S. West Coast, British Columbia, Alaska), we identified the top 20 species with respect to total biomass in all survey years. 
                         We also added the top 20 species that have been ranked as occurring in multiple areas, as part of the ",
-                        HTML(' <a href = "https://doi.org/10.5281/zenodo.10031852" target = "_self" >surveyjoin</a> package.'),
+                        HTML(' <a href = "https://doi.org/10.5281/zenodo.10031852" target = "_blank" >surveyjoin</a> package.'),
                  "See citations for more information on the surveys and data collection."),
                  tags$b(tags$u("Regions and Associated Surveys")),
                  tags$div(
@@ -236,12 +236,12 @@ ui <- page_sidebar(
                card_header("Code and Acknowledgements", style = "background-color: #d7d7d7;"),
                card_body(
                  tags$p("This app uses plotting functions from the ",
-                        tags$a(href = "https://doi.org/10.5281/zenodo.15932836", "fishyplots", target = "_self"), 
+                        tags$a(href = "https://doi.org/10.5281/zenodo.15932836", "fishyplots", target = "_blank"), 
                         " package, authored by Callie Murakami and Zoe Khan during their 2025 summer internship. 
                     The code is heavily inspired by the Fisheries and Oceans Canada ",
-                        tags$a(href = "https://github.com/pbs-assess/gfsynopsis", "BC Groundfish Data Synopsis Report", target = "_self"),
+                        tags$a(href = "https://github.com/pbs-assess/gfsynopsis", "BC Groundfish Data Synopsis Report", target = "_blank"),
                         " and builds off an ",
-                        tags$a(href = "https://github.com/DFO-NOAA-Pacific/gfsynopsis-noaa", "initial version", target = "_self"),
+                        tags$a(href = "https://github.com/DFO-NOAA-Pacific/gfsynopsis-noaa", "initial version", target = "_blank"),
                         " from 2024.")
                )),
              card(
@@ -249,7 +249,7 @@ ui <- page_sidebar(
                card_header("Feedback", style = "background-color: #d7d7d7;"),
                card_body(
                  tags$p("Have a question or found a bug? Please ", 
-                        HTML(' <a href = "https://github.com/DFO-NOAA-Pacific/shinyfishyplots/issues" target = "_self" >report here</a>.')
+                        HTML(' <a href = "https://github.com/DFO-NOAA-Pacific/shinyfishyplots/issues" target = "_blank" >report here</a>.')
                  )
                )),
              card(full_screen = FALSE,
@@ -350,9 +350,9 @@ ui <- page_sidebar(
                  title = "Disclaimer",
                card_body(
                  tags$p("Maps were made using land data from ",
-                 HTML(' <a href = "https://doi.org/10.32614/CRAN.package.rnaturalearth" target = "_self" >rnaturalearth</a>.'),
+                 HTML(' <a href = "https://doi.org/10.32614/CRAN.package.rnaturalearth" target = "_blank" >rnaturalearth</a>.'),
                  "Spatial predictions were generated using a model-based approach applied to the most recent year of survey data with ",
-                 HTML(' <a href = "https://pbs-assess.github.io/sdmTMB/", "sdmTMB", target = "_self" >sdmTMB</a>.'),
+                 HTML(' <a href = "https://pbs-assess.github.io/sdmTMB/", "sdmTMB", target = "_blank" >sdmTMB</a>.'),
                  "Because of differences in years or model settings, these results may not capture true distributions and may differ from other presentations. 
                 These maps are exploratory and should not be used as definitive sources for management decisions.")
                )
