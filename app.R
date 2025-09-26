@@ -145,9 +145,9 @@ ui <- page_sidebar(
     
     conditionalPanel( # Home tab sidebar : no selections
       condition = "input.tabs == 'Home'",
-      div("A tool to visualize data from NOAA and DFO surveys.",
+      div("A tool to visualize data from NOAA and DFO scientific surveys.",
           style = "font-size:16px; color:black;"),
-      div("Select a tab to get started!",
+      div("Select a tab to get started.",
           style = "font-size:16px; color:black; font-weight: bold;")
     ),
     
@@ -157,7 +157,7 @@ ui <- page_sidebar(
         inputId = "surveys_selected",
         label = "Select surveys",
         choices = c(
-          "U.S. West Coast", "Hectate Strait" = "SYN HS", "Queen Chatlotte Sound" = "SYN QCS", "Haida Gwaii" = "SYN WCHG", "Vancouver Island" = "SYN WCVI",
+          "U.S. West Coast", "Hectate Strait" = "SYN HS", "Queen Chatlotte Sound" = "SYN QCS", "Haida Gwaii" = "SYN WCHG", "West Coast Vancouver Island" = "SYN WCVI",
           "Gulf of Alaska" = "U.S. Gulf of Alaska",
           "Aleutian Islands" = "U.S. Aleutian Islands",
           "Eastern Bering Slope" = "U.S. Eastern Bering Sea Slope",
@@ -182,7 +182,7 @@ ui <- page_sidebar(
       checkboxGroupInput(
         inputId = "surveys_selected",
         label = "Select surveys",
-        choices = c("Hectate Strait" = "SYN HS", "Queen Chatlotte Sound" = "SYN QCS", "Haida Gwaii" = "SYN WCHG", "Vancouver Island" = "SYN WCVI" )
+        choices = c("Hectate Strait" = "SYN HS", "Queen Chatlotte Sound" = "SYN QCS", "Haida Gwaii" = "SYN WCHG", "West Coast Vancouver Island" = "SYN WCVI" )
       )
     ), 
   ),
@@ -195,8 +195,8 @@ ui <- page_sidebar(
                full_screen = FALSE,
                card_header("About this tool", style = "background-color: #d7d7d7;"),
                card_body(
-                 tags$p(tags$strong("Welcome!"),"This interactive app serves as a coastwide synopsis of fisheries in the northeast Pacific Ocean,
-                   providing information on fish biology, predicted spatial distributions, and biomass. This tool is intended to support managers, scientists, collaborators, and others to explore available data for monitoring and management of marine ecosystems and resources.")
+                 tags$p("This interactive app serves as a coastwide synopsis for groundfish in the northeast Pacific Ocean,
+                   providing information on fish biology, predicted spatial distributions, and biomass index trends. This tool is intended to support managers, scientists, collaborators, and others to explore available data for monitoring and management of marine ecosystems and resources.")
                ) ),
              card(
                full_screen = FALSE,
@@ -207,7 +207,7 @@ ui <- page_sidebar(
                  "and ", tags$strong("Fisheries and Oceans Canada (DFO)"),", compiled from NOAA's Alaska Fisheries Science Center (AFSC) and Northwest Fisheries Science Center (NWFSC), and DFO's Pacific Biological Station (PBS).
                  For each survey region (U.S. West Coast, British Columbia, Alaska), we identified the top 20 species with respect to total biomass in all survey years. 
                         We also added the top 20 species that have been ranked as occurring in multiple areas, as part of the ",
-                        HTML(' <a href = "https://doi.org/10.5281/zenodo.10031852" target = "_self" >surveyjoin</a> package.'),
+                        HTML(' <a href = "https://doi.org/10.5281/zenodo.10031852" target = "_blank" >surveyjoin</a> package.'),
                  "See citations for more information on the surveys and data collection."),
                  tags$b(tags$u("Regions and Associated Surveys")),
                  tags$div(
@@ -236,46 +236,64 @@ ui <- page_sidebar(
                card_header("Code and Acknowledgements", style = "background-color: #d7d7d7;"),
                card_body(
                  tags$p("This app uses plotting functions from the ",
-                        tags$a(href = "https://doi.org/10.5281/zenodo.15932836", "fishyplots", target = "_self"), 
+                        tags$a(href = "https://doi.org/10.5281/zenodo.15932836", "fishyplots", target = "_blank"), 
                         " package, authored by Callie Murakami and Zoe Khan during their 2025 summer internship. 
                     The code is heavily inspired by the Fisheries and Oceans Canada ",
-                        tags$a(href = "https://publications.gc.ca/site/eng/9.943594/publication.html", " 2023 data report", target = "_self"),
+                        tags$a(href = "https://github.com/pbs-assess/gfsynopsis", "BC Groundfish Data Synopsis Report", target = "_blank"),
                         " and builds off an ",
-                        tags$a(href = "https://github.com/DFO-NOAA-Pacific/gfsynopsis-noaa", "initial version", target = "_self"),
-                        " from summer 2024.")
+                        tags$a(href = "https://github.com/DFO-NOAA-Pacific/gfsynopsis-noaa", "initial version", target = "_blank"),
+                        " from 2024.")
                )),
              card(
                full_screen = FALSE,
                card_header("Feedback", style = "background-color: #d7d7d7;"),
                card_body(
                  tags$p("Have a question or found a bug? Please ", 
-                        HTML(' <a href = "https://github.com/DFO-NOAA-Pacific/shinyfishyplots/issues" target = "_self" >report here</a>.')
+                        HTML(' <a href = "https://github.com/DFO-NOAA-Pacific/shinyfishyplots/issues" target = "_blank" >report here</a>.')
                  )
                )),
              card(full_screen = FALSE,
-                  card_header("Citations", style = "background-color: #d7d7d7;"),
+                  card_header("Data References", style = "background-color: #d7d7d7;"),
                   card_body(
                       tags$strong("Aleutians Islands Bottom Trawl Survey"),
-                      tags$ul(tags$li("Von Szalay PG, Raring NW, Siple MC, Dowlin AN, Riggle BC, and Laman EA. 2023. Data Report: 2022 Aleutian Islands bottom trawl survey. U.S. Dep. Commer. DOI: 10.25923/85cy-g225.")),
+                      tags$ul(tags$li("Von Szalay PG, Raring NW, Siple MC, Dowlin AN, Riggle BC, and Laman EA. 2023. Data Report: 2022 Aleutian Islands bottom trawl survey. U.S. Dep. Commer. DOI: ",
+                 tags$a("10.25923/85cy-g225", 
+                        href = "https://doi.org/10.25923/85cy-g225", 
+                        target = "_blank"))),
                       tags$strong("Gulf of Alaska Bottom Trawl Survey"), 
-                      tags$ul(tags$li("Siple MC, von Szalay PG, Raring NW, Dowlin AN, Riggle BC. 2024. Data Report: 2023 Gulf of Alaska bottom trawl survey. DOI: 10.25923/GBB1-X748.")),
+                      tags$ul(tags$li("Siple MC, von Szalay PG, Raring NW, Dowlin AN, Riggle BC. 2024. Data Report: 2023 Gulf of Alaska bottom trawl survey. DOI: ",
+                 tags$a("10.25923/GBB1-X748", 
+                        href = "https://doi.org/10.25923/GBB1-X748", 
+                        target = "_blank"))),
                       tags$strong("Eastern & Northern Bering Sea Crab/Groundfish Bottom Trawl Surveys"), 
                       tags$ul(
                         tags$li("Zacher LS, Richar JI, Fedewa EJ, Ryznar ER, Litzow MA. 2023. The 2023 Eastern Bering Sea Continental Shelf Trawl Survey: Results for Commercial Crab Species. U.S. Dep. Commer, 213 p."),
                         tags$li("Markowitz EH, Dawson EJ, Wassermann S, Anderson AB, Rohan SK, Charriere BK, Stevenson DE. 2024. Results of the 2023 eastern and northern Bering Sea continental shelf bottom trawl survey of groundfish and invertebrate fauna. U.S. Dep. Commer.")),
                         tags$strong("Eastern Bering Sea Slope Bottom Trawl Survey"),
                         tags$ul(
-                          tags$li("Hoff GR. 2016. Results of the 2016 eastern Bering Sea upper continental slope survey of groundfishes and invertebrate resources. U.S. Dep. Commer. DOI: 10.7289/V5/TM-AFSC-339.")),
+                          tags$li("Hoff GR. 2016. Results of the 2016 eastern Bering Sea upper continental slope survey of groundfishes and invertebrate resources. U.S. Dep. Commer. DOI: ",
+        tags$a("10.7289/V5/TM-AFSC-339", 
+               href = "https://doi.org/10.7289/V5/TM-AFSC-339", 
+               target = "_blank"))),
                       tags$strong("Fisheries and Oceans Canada Synoptic Bottom Trawl Surveys"), 
                       tags$ul(
-                        tags$li("Nottingham MK, Williams DC, Wyeth MR, Olsen N. 2017. Summary of the West Coast Vancouver Island synoptic bottom trawl survey, May 28 – June 21, 2014. DFO Can. Manuscr. Rep. Fish. Aquat. Sci. 2017/3140, viii + 55 p, Nanaimo."),
+                        tags$li(
+                          "Anderson SC, Keppel EA, Edwards AM. 2019. ",
+                          HTML('<a href="https://www.dfo-mpo.gc.ca/csas-sccs/Publications/ResDocs-DocRech/2019/2019_041-eng.html" target="_blank">
+       A reproducible data synopsis for over 100 species of British Columbia groundfish</a>.'),
+                          " DFO Can. Sci. Advis. Sec. Res. Doc. 2019/041, vii + 321 p."
+                        ),
                         tags$li("Sinclair A, Schnute J, Haigh R, Starr P, Stanley R, Fargo J, Workman G. 2003. Feasibility of Multispecies Groundfish Bottom Trawl Surveys on the BC Coast. DFO Canadian Science Advisory Secretariat (CSAS) Research Document, 2003/049."),
+                        tags$li(HTML("Nottingham MK, Williams DC, Wyeth MR, Olsen N. 2017. <a href='https://publications.gc.ca/site/eng/9.848701/publication.html' target='_blank'>Summary of the West Coast Vancouver Island synoptic bottom trawl survey, May 28 – June 21, 2014</a>. DFO Can. Manuscr. Rep. Fish. Aquat. Sci. 2017/3140, viii + 55 p, Nanaimo.")),
                         tags$li("Williams DC, Nottingham MK, Olsen N, Wyeth MR. 2018a. Summary of the Queen Charlotte Sound synoptic bottom trawl survey, July 6 – August 8, 2015. DFO Can. Manuscr. Rep. Fish. Aquat. Sci. 3136, viii + 64 p, Nanaimo."),
                         tags$li("Williams DC, Nottingham MK, Olsen N, Wyeth MR. 2018b. Summary of the West Coast Haida Gwaii synoptic bottom trawl survey, August 25 – October 2, 2014. DFO Can. Manuscr. Rep. Fish. Aquat. Sci. 2018/3134, viii + 42 p, Nanaimo."),
                         tags$li("Wyeth MR, Olsen N, Nottingham MK, Williams DC. 2018. Summary of the Hecate Strait synoptic bottom trawl survey, May 26 – June 22, 2015. DFO Can. Manuscr. Rep. Fish. Aquat. Sci. 2018/3126, viii + 55 p, Nanaimo.")),
                       tags$strong("USA West Coast Bottom Trawl Surveys"), 
                       tags$ul(
-                        tags$li("Keller AA, Wallace JR, Methot RD. 2017. The Northwest Fisheries Science Center’s West Coast Groundfish Bottom Trawl Survey: history, design, and description. DOI: 10.7289/V5/TM-NWFSC-136."))
+                        tags$li("Keller AA, Wallace JR, Methot RD. 2017. The Northwest Fisheries Science Center's West Coast Groundfish Bottom Trawl Survey: history, design, and description. DOI: ",
+                          tags$a("10.7289/V5/TM-NWFSC-136", 
+                            href = "https://doi.org/10.7289/V5/TM-NWFSC-136", 
+                            target = "_blank")))
                   ))
              ),
     
@@ -290,7 +308,9 @@ ui <- page_sidebar(
                card_body(
                  tags$p("When", 
                  tags$strong("'All Regions'"),
-                 " is selected, only standardized biomass indices are shown and can be viewed for multiple survey areas. Indices were standardized by dividing each survey’s values by its mean, setting the average to 1. See 'About the Data' in the 'Home' tab for information on the region/survey groupings and abbreviations." ))) )),
+                 " is selected, only standardized biomass indices are shown and can be viewed for multiple survey areas. Indices were standardized by dividing each survey's values by its mean, setting the average to 1. See ",
+                 actionLink("go_home_1", "'About the Data' in the 'Home' tab", style = "color: #2C3E79; text-decoration: underline;"),
+                 " for information on the region/survey groupings and abbreviations." ))) )),
 
              conditionalPanel( #only show card when all regions NOT selected
                condition = "input.region != 'All regions'",
@@ -298,9 +318,11 @@ ui <- page_sidebar(
                  open = NULL,
                  accordion_panel(
                    title = "Design-Based Biomass Indicies",
-               card_body(tags$div("These biomass indicies are design-based and may be calculated differently among science centers.", 
+               card_body(tags$div("These biomass indicies are design-based and may be calculated differently among science centers.",
                                   tags$strong("Not all surveys have yearly biomass estimates."),
-                                  " Indices were standardized by dividing each survey’s values by its mean, setting the average to 1. To compare standardized biomass estimations for different regions, select 'All Regions'. See 'About the Data' in the 'Home' tab for information on the region/survey groupings and abbreviations."))))),
+                                  " Indices were standardized by dividing each survey's values by its mean, setting the average to 1. To compare standardized biomass estimations for different regions, select 'All Regions'. See ",
+                                  actionLink("go_home_2", "'About the Data' in the 'Home' tab", style = "color: #2C3E79; text-decoration: underline;"),
+                                  " for information on the region/survey groupings and abbreviations."))))),
              
              withSpinner(uiOutput("dbiPlotUI"), type = 3, size = 2, color.background = "#FFFFFFD0"), #dynamic height
              downloadButton("downloadBiomass", "Download Biomass Plot"),
@@ -327,10 +349,10 @@ ui <- page_sidebar(
                accordion_panel(
                  title = "Disclaimer",
                card_body(
-                 tags$p("Maps were made using land data from rnaturalearth ",
-                 HTML(' <a href = "https://doi.org/10.32614/CRAN.package.rnaturalearth" target = "_self" >(Massicotte & South 2025)</a>.'),
+                 tags$p("Maps were made using land data from ",
+                 HTML(' <a href = "https://doi.org/10.32614/CRAN.package.rnaturalearth" target = "_blank" >rnaturalearth</a>.'),
                  "Spatial predictions were generated using a model-based approach applied to the most recent year of survey data with ",
-                 HTML(' <a href = "https://pbs-assess.github.io/sdmTMB/", "sdmTMB", target = "_self" >sdmTMB</a>.'),
+                 HTML(' <a href = "https://pbs-assess.github.io/sdmTMB/", "sdmTMB", target = "_blank" >sdmTMB</a>.'),
                  "Because of differences in years or model settings, these results may not capture true distributions and may differ from other presentations. 
                 These maps are exploratory and should not be used as definitive sources for management decisions.")
                )
@@ -348,7 +370,7 @@ ui <- page_sidebar(
                open = NULL,
                accordion_panel(
                  title = "Sampling Overview",
-               card_body("These plots display the number of biological measurements taken and tow effort for selected regions and species. 'Unread Ages' are the number of fishes with age structures collected but not analysed. For completely unrounded counts, use the data download below. "))),
+               card_body("These plots display the number of biological measurements taken and tow effort for selected regions and species. 'Unread Ages' are the number of fishes with age structures collected but not analysed. For unrounded counts, use the data download below. "))),
              div(style = "overflow-x: scroll; min-width: 1200px;", #scrollable window
                  withSpinner(plotOutput("surveytable"), type = 3, size = 2, color.background = "#FFFFFFD0")),
              downloadButton("downloadSurveyTable", "Download Survey Plot"),
@@ -376,6 +398,16 @@ ui <- page_sidebar(
 
 ##### Define Server #####
 server <- function(input, output, session) {
+  #### Navigation handlers ####
+  # Handle actionLink clicks to navigate to Home tab
+  observeEvent(input$go_home_1, {
+    updateTabsetPanel(session, "tabs", selected = "Home")
+  })
+
+  observeEvent(input$go_home_2, {
+    updateTabsetPanel(session, "tabs", selected = "Home")
+  })
+
   #### species selection ####
   # Dynamic species selection based on region
   region_names <- reactive({
