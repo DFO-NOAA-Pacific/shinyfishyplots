@@ -256,7 +256,8 @@ ui <- page_sidebar(
             HTML(
               ' <a href = "https://doi.org/10.5281/zenodo.10031852" target = "_blank" >surveyjoin</a> package.'
             ),
-            "See citations for more information on the surveys and data collection."
+            "See citations for more information on the surveys and data collection. Note that some surveys use different gears and protocols, which can influence catchability and selectivity; 
+            yet such surveys are combined within the Aleutians/Bering Sea region here to align data summaries with fishery management areas (for exploratory purposes only)."
           ),
           tags$b(tags$u("Regions and Associated Surveys")),
           tags$div(
