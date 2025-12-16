@@ -537,8 +537,7 @@ ui <- page_sidebar(
               HTML(
                 ' <a href = "https://pbs-assess.github.io/sdmTMB/", "sdmTMB", target = "_blank" >sdmTMB</a>.'
               ),
-              "Because of differences in years or model settings, these results may not capture true distributions and may differ from other presentations. 
-                These maps are exploratory and should not be used as definitive sources for management decisions."
+              "Because of differences in years or model settings, these results may not capture true distributions and may differ from other presentations. Notably, there are differences in gears between surveys (e.g., within the Aleutians/Bering Sea region) and these predictions are not adjusted for the resulting differences in catchability. Due to the large spatial scale, the maps are coarse approximations to broad spatial patterns and do not include habitat covariates which may be necessary for resolving fine-scale contrasts. These maps are exploratory and should not be used as definitive sources for management decisions or inference regarding population size at a specific location."
             )
           )
         )
