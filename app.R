@@ -612,6 +612,28 @@ ui <- page_sidebar(
       tableOutput("dbitable"),
       downloadButton("downloaddbi", "Download design-based biomass indices")
     )
+    ,
+    #### Assessment-driven species tab (assessment-driven, not survey-frequency-driven) ####
+    tabPanel(
+      "Assessment-driven species (assessment-driven, not survey-frequency-driven)",
+      tags$div(
+        style = "margin-bottom: 8px;",
+        tags$strong("Assessment-driven species:"),
+        "This tab highlights fishery- or assessment-important species that may be rare in surveys but are used in stock assessments. It is separate from the survey-based species lists and selections."
+      ),
+      # Minimal selection UI specific to assessment-driven species (do not change main species selector)
+      selectInput(
+        inputId = "assessment_species",
+        label = "Choose an assessment-driven species",
+        choices = c("widow rockfish" = "widow rockfish"),
+        selected = "widow rockfish"
+      ),
+      tags$div(
+        "Below is a simple, assessment-relevant summary (annual totals where available) derived from available data sources. This is intended to provide assessment-oriented context and is not a replacement for formal assessment datasets."
+      ),
+      plotOutput("assessmentPlot", height = "450px"),
+      tableOutput("assessmentTable")
+    )
   )
 )
 
@@ -663,6 +685,52 @@ server <- function(input, output, session) {
       "surveys_selected",
       selected = character(0)
     )
+  })
+
+  # Assessment-driven species logic (separate from the main survey-driven species selector)
+  # This is intentionally independent to avoid changing existing species selection behavior.
+  assessment_data <- reactive({
+    req(input$assessment_species)
+    df <- all_data |> select(-otosag_id)
+    subset(df, common_name == input$assessment_species & survey %in% region_names())
+  })
+
+  output$assessmentTable <- renderTable({
+    df <- assessment_data()
+    if (nrow(df) == 0) {
+      return(data.frame(Message = paste("No data for", input$assessment_species, "in selected region(s).")))
+    }
+    # choose a numeric column likely to represent catch/biomass if present
+    numeric_cols <- names(df)[sapply(df, is.numeric)]
+    preferred <- intersect(numeric_cols, c("weight_kg", "weight", "biomass_kg", "biomass", "total_weight_kg", "total_weight", "catch_kg", "catch"))
+    col_to_use <- if (length(preferred) > 0) preferred[1] else if (length(numeric_cols) > 0) numeric_cols[1] else NULL
+    if (is.null(col_to_use)) {
+      summary_df <- df %>% group_by(year) %>% summarise(count = n(), .groups = "drop") %>% arrange(year)
+      return(summary_df)
+    } else {
+      summary_df <- df %>% group_by(year) %>% summarise(total = sum(.data[[col_to_use]], na.rm = TRUE), .groups = "drop") %>% arrange(year)
+      names(summary_df)[2] <- paste0("total_", col_to_use)
+      return(summary_df)
+    }
+  })
+
+  output$assessmentPlot <- renderPlot({
+    df <- assessment_data()
+    if (nrow(df) == 0) {
+      plot.new()
+      text(0.5, 0.5, paste("No data for", input$assessment_species, "in selected region(s)."))
+      return()
+    }
+    numeric_cols <- names(df)[sapply(df, is.numeric)]
+    preferred <- intersect(numeric_cols, c("weight_kg", "weight", "biomass_kg", "biomass", "total_weight_kg", "total_weight", "catch_kg", "catch"))
+    col_to_use <- if (length(preferred) > 0) preferred[1] else if (length(numeric_cols) > 0) numeric_cols[1] else NULL
+    if (is.null(col_to_use)) {
+      plot_df <- df %>% group_by(year) %>% summarise(count = n(), .groups = "drop")
+      ggplot(plot_df, aes(x = year, y = count)) + geom_col() + labs(x = "Year", y = "Count", title = input$assessment_species)
+    } else {
+      plot_df <- df %>% group_by(year) %>% summarise(total = sum(.data[[col_to_use]], na.rm = TRUE), .groups = "drop")
+      ggplot(plot_df, aes(x = year, y = total)) + geom_col() + labs(x = "Year", y = paste0("Total (", col_to_use, ")"), title = input$assessment_species)
+    }
   })
 
   #### Data Downloads ####
