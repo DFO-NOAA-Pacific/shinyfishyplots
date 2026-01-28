@@ -188,7 +188,9 @@ ui <- page_sidebar(
           "Aleutian Islands" = "U.S. Aleutian Islands",
           "Eastern Bering Slope" = "U.S. Eastern Bering Sea Slope",
           "Eastern Bering and NW" = "U.S. Eastern Bering Sea Standard Plus NW Region",
-          "Northern Bering" = "U.S. Northern Bering Sea"
+          "Northern Bering" = "U.S. Northern Bering Sea",
+          "IPHC Longline" = "IPHC Longline",
+          "Acoustic" = "Acoustic"
         )
       )
     ),
@@ -217,6 +219,19 @@ ui <- page_sidebar(
           "Queen Chatlotte Sound" = "SYN QCS",
           "Haida Gwaii" = "SYN WCHG",
           "West Coast Vancouver Island" = "SYN WCVI"
+        )
+      )
+    ),
+    conditionalPanel(
+      # additional selection menus for US West Coast BIOMASS
+      condition = "input.region == 'US West Coast' && input.tabs == 'Biomass'",
+      checkboxGroupInput(
+        inputId = "surveys_selected",
+        label = "Select surveys",
+        choices = c(
+          "U.S. West Coast",
+          "Hook & Line",
+          "Triennial"
         )
       )
     ),
@@ -1020,7 +1035,7 @@ server <- function(input, output, session) {
 
       plot_stan_dbi(input$species, valid_dbi_surveys) # show only standardized plot if All regions selected
     } else if (
-      input$region == "Canada" | input$region == "Aleutians/Bering Sea"
+      input$region == "Canada" | input$region == "Aleutians/Bering Sea" | input$region == "US West Coast"
     ) {
       # options for regions with multiple surveys
 
@@ -1118,7 +1133,7 @@ server <- function(input, output, session) {
         }
       )
     } else if (
-      input$region == "Canada" | input$region == "Aleutians/Bering Sea"
+      input$region == "Canada" | input$region == "Aleutians/Bering Sea" | input$region == "US West Coast"
     ) {
       # not all regions, but more than one survey
       # show normal and standardized
