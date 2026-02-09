@@ -55,6 +55,15 @@ spp_list <- list(
   "All regions" = sort(unique(all_data$common_name))
 )
 
+
+#### Source modlule scripts ####
+source("home_module_TEST.R")
+source("biomass_module_TEST.R")
+source("agelength_module_TEST.R")
+source("maps_module_TEST.R")
+source("depth_module_TEST.R")
+source("data_module_TEST.R")
+
 ###### UI #####
 ui <- page_sidebar(
   
@@ -183,7 +192,57 @@ ui <- page_sidebar(
   tabsetPanel(
     id = "tabs",
     tabPanel("Home", home_UI("home")),
-  ...
+    tabPanel("Biomass", biomass_UI("biomass")),
+    tabPanel("Age and Length", agelength_UI("agelength")),
+    tabPanel("Maps", maps_UI("maps")),
+    tabPanel("Depth", depth_UI("depth")),
+    tabPanel("Data", data_UI("data")))
+  )
   
 ###### Server #####
   
+
+server <- function(input, output, session) {
+  
+  #### species selection ####
+  # Dynamic species selection based on region
+  region_names <- reactive({
+    switch(input$region,
+           "US West Coast" = "NWFSC", "Canada" = "PBS", "Aleutians/Bering Sea" = "AK BSAI", "Gulf of Alaska" = "AK GULF", "All regions" = c("AK BSAI", "AK GULF", "PBS", "NWFSC"))
+  })
+  observeEvent(input$region, { 
+    region_species <- spp_list[[input$region]]
+    # Check if currently selected species is also present in the newly selected region:
+    current_spp <- input$species
+    if (!is.null(current_spp) && current_spp %in% region_species) {
+      selected_species <- current_spp
+    } else {
+      selected_species <- "None selected"
+    }
+    updateSelectInput(
+      session,
+      "species",
+      choices = c("None selected", region_species),
+      selected = selected_species
+    )
+  })
+  
+  
+  #### CALL MODULE SERVERS ####
+  home_Server("home")
+  biomass_Server("biomass", all_dbi = all_dbi, region_names = region_names, input_region = reactive(input$region),
+                 input_species = reactive(input$species))
+  agelength_Server("agelength", region_names = region_names, input_region = reactive(input$region),
+                                  input_species = reactive(input$species), lw_predictions = lw_predictions, vb_predictions = vb_predictions)
+  maps_Server("maps",region_names = region_names, input_region = reactive(input$region),
+              input_species = reactive(input$species))
+  depth_Server("depth", all_data = all_data,
+               region_names = region_names, input_region = reactive(input$region),
+               input_species = reactive(input$species))
+  data_Server("data", all_data = all_data, region_names = region_names, input_region = reactive(input$region),
+              input_species = reactive(input$species))
+  
+}
+
+#### run app ####
+shinyApp(ui, server)
