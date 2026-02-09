@@ -110,10 +110,18 @@ home_UI <- function(id) {
 }
 
 
-test_server <- function(id) {
+home_Server <- function(id) {
   moduleServer(
     id,
     function(input, output, session) {
+      
+      observeEvent(input$region, {
+        updateCheckboxGroupInput(
+          session, "surveys_selected",
+          selected = character(0)) })
+      
+      
+      
       
     }
   )
