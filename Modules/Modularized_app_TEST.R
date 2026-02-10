@@ -230,16 +230,16 @@ server <- function(input, output, session) {
   
   #### CALL MODULE SERVERS ####
   home_Server("home")
-  biomass_Server("biomass", all_dbi = all_dbi, region_names = region_names, input_region = reactive(input$region),
+  biomass_Server("biomass", all_dbi = all_dbi, region_names = region_names, surveys_selected = reactive(input$surveys_selected), input_region = reactive(input$region),
                  input_species = reactive(input$species))
-  agelength_Server("agelength", region_names = region_names, input_region = reactive(input$region),
+  agelength_Server("agelength",all_data = all_data, region_names = region_names,
                                   input_species = reactive(input$species), lw_predictions = lw_predictions, vb_predictions = vb_predictions)
-  maps_Server("maps",region_names = region_names, input_region = reactive(input$region),
+  maps_Server("maps",predictions = predictions, region_names = region_names,
               input_species = reactive(input$species))
   depth_Server("depth", all_data = all_data,
-               region_names = region_names, input_region = reactive(input$region),
+               region_names = region_names,
                input_species = reactive(input$species))
-  data_Server("data", all_data = all_data, region_names = region_names, input_region = reactive(input$region),
+  data_Server("data", all_data = all_data,lw_predictions = lw_predictions, vb_predictions = vb_predictions, predictions = predictions, region_names = region_names,
               input_species = reactive(input$species))
   
 }

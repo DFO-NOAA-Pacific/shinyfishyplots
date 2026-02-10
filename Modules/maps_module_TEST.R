@@ -17,21 +17,17 @@ maps_UI <- function(id) {
                 These maps are exploratory and should not be used as definitive sources for management decisions.")
         )
       )),
-    withSpinner(uiOutput("dynamicMap"), type = 3, size = 2, color.background = "#FFFFFFD0"), #dynamic height
-    downloadButton("downloadMapPlot", "Download map"))
+    withSpinner(uiOutput(ns("dynamicMap")), type = 3, size = 2, color.background = "#FFFFFFD0"), #dynamic height
+    downloadButton(ns("downloadMapPlot"), "Download map"))
 }
 
 
-maps_Server <- function(id, region_names, input_region, input_species) {
+maps_Server <- function(id, predictions, region_names, input_species) {
   moduleServer(
     id,
     function(input, output, session) {
       #### Map plots and downloads ####
-      map_subset <- reactive({
-        predictions <- predictions |> select(-sanity) |> select(-survey)
-        subset(predictions, species == input_species & subregion %in% region_names())
-      })
-      
+     
       map_height1 <- reactive({
         if (setequal(region_names(), c("AK BSAI", "AK GULF", "PBS", "NWFSC"))) {
           "1800px"
@@ -45,19 +41,21 @@ maps_Server <- function(id, region_names, input_region, input_species) {
       })
       
       output$dynamicMap <- renderUI({
+        ns <- session$ns
         validate( #message for none selected
-          need(input_species != "" && input_species != "None selected",
+          need(input_species() != "" && input_species() != "None selected",
                paste("Choose a species")))
-        req(input_species != "None selected")
-        plotOutput("modelPlot", height = map_height1())
+        req(input_species() != "None selected")
+        plotOutput(ns("modelPlot"), height = map_height1())
       })
       
       output$modelPlot <- renderPlot({
+       
         validate( #message for none selected
-          need(input_species != "" && input_species != "None selected",
+          need(input_species() != "" && input_species() != "None selected",
                paste("Choose a species")))
-        req(input_species != "None selected")
-        fishmap(predictions, region_names(), input_species)})
+        req(input_species() != "None selected")
+        fishmap(predictions, region_names(), input_species())})
       
       map_height2 <- reactive({
         if (setequal(region_names(), c("AK BSAI", "AK GULF", "PBS", "NWFSC"))) {
@@ -72,8 +70,8 @@ maps_Server <- function(id, region_names, input_region, input_species) {
       })
       
       output$downloadMapPlot <- downloadHandler(
-        filename = function() {paste0("map_", input_species, ".png")},
-        content = function(file) {ggsave(file, plot = fishmap(predictions, region_names(), input_species), height = map_height2(), device = "png")})
+        filename = function() {paste0("map_", input_species(), ".png")},
+        content = function(file) {ggsave(file, plot = fishmap(predictions, region_names(), input_species()), height = map_height2(), device = "png")})
       
       
       
