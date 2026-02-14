@@ -1,4 +1,13 @@
-# whole app
+
+library(shiny)
+library(bslib)
+library(surveyjoin)
+library(sdmTMB)
+library(fishyplots) #devtools::install_github("DFO-NOAA-Pacific/fishyplots")
+library(ggplot2)
+library(dplyr)
+library(patchwork)
+library(shinycssloaders)
 
 
 ##### Data #####
@@ -155,7 +164,7 @@ ui <- page_sidebar(
     conditionalPanel( # additional selection menus for ALL REGIONS BIOMASS
       condition = "input.region == 'All regions' && input.tabs == 'Biomass'",
       checkboxGroupInput(
-        inputId = "surveys_selected",
+        inputId = "surveys_selected_all",
         label = "Select surveys",
         choices = c(
           "U.S. West Coast", "Hectate Strait" = "SYN HS", "Queen Chatlotte Sound" = "SYN QCS", "Haida Gwaii" = "SYN WCHG", "Vancouver Island" = "SYN WCVI",
@@ -169,7 +178,7 @@ ui <- page_sidebar(
     conditionalPanel( # additional selection menus for AK BSAI BIOMASS
       condition = "input.region == 'Aleutians/Bering Sea' && input.tabs == 'Biomass'",
       checkboxGroupInput(
-        inputId = "surveys_selected",
+        inputId = "surveys_selected_bsai",
         label = "Select surveys)",
         choices = c(
           "Aleutian Islands" = "U.S. Aleutian Islands",
@@ -181,7 +190,7 @@ ui <- page_sidebar(
     conditionalPanel( # additional selection menus for CANADA BIOMASS
       condition = "input.region == 'Canada' && input.tabs == 'Biomass'",
       checkboxGroupInput(
-        inputId = "surveys_selected",
+        inputId = "surveys_selected_pbs",
         label = "Select surveys",
         choices = c("Hectate Strait" = "SYN HS", "Queen Chatlotte Sound" = "SYN QCS", "Haida Gwaii" = "SYN WCHG", "Vancouver Island" = "SYN WCVI" )
       )
@@ -224,13 +233,21 @@ server <- function(input, output, session) {
       "species",
       choices = c("None selected", region_species),
       selected = selected_species
-    )
-  })
-  
+    )})
+    
+    # reset biomass survey selections after choosing different region
+    observeEvent(input$region, {
+      updateCheckboxGroupInput(session, "surveys_selected_all", selected = character(0))
+      updateCheckboxGroupInput(session, "surveys_selected_bsai", selected = character(0))
+      updateCheckboxGroupInput(session, "surveys_selected_pbs", selected = character(0))
+    }, ignoreInit = TRUE)
   
   #### CALL MODULE SERVERS ####
   home_Server("home")
-  biomass_Server("biomass", all_dbi = all_dbi, region_names = region_names, surveys_selected = reactive(input$surveys_selected), input_region = reactive(input$region),
+  biomass_Server("biomass", all_dbi = all_dbi, region_names = region_names, 
+                 surveys_all = reactive(input$surveys_selected_all),
+                 surveys_bsai = reactive(input$surveys_selected_bsai),
+                 surveys_pbs = reactive(input$surveys_selected_pbs), input_region = reactive(input$region),
                  input_species = reactive(input$species))
   agelength_Server("agelength",all_data = all_data, region_names = region_names,
                                   input_species = reactive(input$species), lw_predictions = lw_predictions, vb_predictions = vb_predictions)
