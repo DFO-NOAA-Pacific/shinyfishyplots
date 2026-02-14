@@ -11,12 +11,44 @@ biomass_UI <- function(id) {
     downloadButton(ns("downloadStanBiomass"), "Download Standardized Biomass Plot"))
 }
 
-biomass_Server <- function(id, all_dbi, region_names, input_region, surveys_selected, input_species) {
+biomass_Server <- function(id, all_dbi, region_names, input_region, surveys_all, surveys_bsai, surveys_pbs, input_species) {
   moduleServer(
     id,
     function(input, output, session) {
-      print("biomass module active")
       
+      ## reactive and observe to separate and reset survey selections between multi-select regions
+      surveys_selected <- reactive({
+        region <- input_region()
+        
+        result <- if (region == "All regions") {
+          surveys_all()
+        } else if (region == "Aleutians/Bering Sea") {
+          surveys_bsai()
+        } else if (region == "Canada") {
+          surveys_pbs()
+        } else {
+          NULL
+        }
+      })
+      
+      observeEvent(input_region(), {
+        # When region changes, clear all survey selections
+        updateCheckboxGroupInput(
+          session = getDefaultReactiveDomain(),
+          inputId = "surveys_selected_all",
+          selected = character(0)
+        )
+        updateCheckboxGroupInput(
+          session = getDefaultReactiveDomain(),
+          inputId = "surveys_selected_bsai", 
+          selected = character(0)
+        )
+        updateCheckboxGroupInput(
+          session = getDefaultReactiveDomain(),
+          inputId = "surveys_selected_pbs",
+          selected = character(0)
+        )
+      }, ignoreInit = TRUE)
       
       #### Conditional description card ###
       output$description_card <- renderUI({
@@ -42,32 +74,27 @@ biomass_Server <- function(id, all_dbi, region_names, input_region, surveys_sele
       
       #### Biomass plots and downloads ####
       output$dbiPlotUI <- renderUI({
-        print("Renderplot running")
-        print(input_region())
         ns <- session$ns
         
         if (input_region() == "All regions") {
-          req(surveys_selected())
+          #req(surveys_selected())
+          
           plotOutput(ns("dbiPlot"), height = "500px")  # smaller for All regions, only one plot
         } else {
           plotOutput(ns("dbiPlot"), height = "900px")  # larger for stacked plots
         }
       })
       
-      output$dbiPlot <- renderPlot({
-        
-        print("Renderplot running")
-        req(input_species())
-        req(input_region())
-        
+   output$dbiPlot <- renderPlot({
         
         if (input_region() == "All regions") { # messages for no region or species 
-          req(surveys_selected())
-          validate(#message for none selected
-            need(!is.null(surveys_selected()) && length(surveys_selected()) > 0,
-                 "Choose survey(s)"),
-            need(input_species() != "" && input_species() != "None selected",
-                 paste("Choose a species")))
+          # species <- input_species()
+          # surveys <- surveys_selected()
+          
+          #req(surveys_selected())
+          validate(
+            need(input_species() != "" && input_species() != "None selected","Choose a species"),
+            need(!is.null(surveys_selected()) && length(surveys_selected()) > 0, "Choose survey(s)"))
           
           #create message if there is no DBI data for all selected surveys
           valid_dbi_surveys <- all_dbi |> 
@@ -83,7 +110,7 @@ biomass_Server <- function(id, all_dbi, region_names, input_region, surveys_sele
           # Show a warning notif if some of selected surveys have no data
           if (length(invalid_dbi_surveys) > 0) {
             showNotification(
-              paste("No data for", input_species(), "in:", paste(invalid_dbi_surveys, collapse = ", ")),
+              paste("No data for",input_species(), "in:", paste(invalid_dbi_surveys, collapse = ", ")),
               type = "warning"
             )
           }
