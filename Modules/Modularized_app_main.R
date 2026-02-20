@@ -66,12 +66,12 @@ spp_list <- list(
 
 
 #### Source modlule scripts ####
-source("home_module_TEST.R")
-source("biomass_module_TEST.R")
-source("agelength_module_TEST.R")
-source("maps_module_TEST.R")
-source("depth_module_TEST.R")
-source("data_module_TEST.R")
+source("home_module.R")
+source("biomass_module.R")
+source("agelength_module.R")
+source("maps_module.R")
+source("depth_module.R")
+source("data_module.R")
 
 ###### UI #####
 ui <- page_sidebar(
