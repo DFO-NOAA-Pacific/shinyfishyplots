@@ -8,7 +8,7 @@ data_UI <- function(id) {
       open = NULL,
       accordion_panel(
         title = "Sampling Overview",
-        card_body("These plots display the number of biological measurements taken and tow effort for selected regions and species. 'Unread Ages' are the number of fishes with age structures collected but not analysed. For completely unrounded counts, use the data download below. "))),
+        card_body("These plots display the number of biological measurements taken and tow effort for selected regions and species. 'Unread Ages' are the number of fishes with age structures collected but not analysed. For unrounded counts, use the data download below. "))),
     div(style = "overflow-x: scroll; min-width: 1200px;", #scrollable window
         withSpinner(plotOutput(ns("surveytable")), type = 3, size = 2, color.background = "#FFFFFFD0")),
     downloadButton(ns("downloadSurveyTable"), "Download Survey Plot"),

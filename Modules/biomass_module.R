@@ -60,15 +60,19 @@ biomass_Server <- function(id, all_dbi, region_names, input_region, surveys_all,
             card_body(
               tags$p("When", 
                      tags$strong("'All Regions'"),
-                     " is selected, only standardized biomass indices are shown and can be viewed for multiple survey areas. Indices were standardized by dividing each survey’s values by its mean, setting the average to 1. See 'About the Data' in the 'Home' tab for information on the region/survey groupings and abbreviations." ))) )
+                     " is selected, only standardized biomass indices are shown and can be viewed for multiple survey areas. Indices were standardized by dividing each survey's values by its mean, setting the average to 1. See ",
+                     actionLink("go_home_1", "'About the Data' in the 'Home' tab", style = "color: #2C3E79; text-decoration: underline;"),
+                     " for information on the region/survey groupings and abbreviations." ))) )
           } else { #only show card when all regions NOT selected
         accordion(
           open = NULL,
           accordion_panel(
             title = "Design-Based Biomass Indicies",
-            card_body(tags$div("These biomass indicies are design-based and may be calculated differently among science centers.", 
+            card_body(tags$div("These biomass indicies are design-based and may be calculated differently among science centers.",
                                tags$strong("Not all surveys have yearly biomass estimates."),
-                               " Indices were standardized by dividing each survey’s values by its mean, setting the average to 1. To compare standardized biomass estimations for different regions, select 'All Regions'. See 'About the Data' in the 'Home' tab for information on the region/survey groupings and abbreviations."))))}
+                               " Indices were standardized by dividing each survey's values by its mean, setting the average to 1. To compare standardized biomass estimations for different regions, select 'All Regions'. See ",
+                               actionLink("go_home_2", "'About the Data' in the 'Home' tab", style = "color: #2C3E79; text-decoration: underline;"),
+                               " for information on the region/survey groupings and abbreviations."))))}
       })
       
       

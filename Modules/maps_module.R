@@ -9,12 +9,11 @@ maps_UI <- function(id) {
       accordion_panel(
         title = "Disclaimer",
         card_body(
-          tags$p("Maps were made using land data from rnaturalearth ",
-                 HTML(' <a href = "https://doi.org/10.32614/CRAN.package.rnaturalearth" target = "_self" >(Massicotte & South 2025)</a>.'),
+          tags$p("Maps were made using land data from ",
+                 HTML(' <a href = "https://doi.org/10.32614/CRAN.package.rnaturalearth" target = "" >rnaturalearth</a>.'),
                  "Spatial predictions were generated using a model-based approach applied to the most recent year of survey data with ",
-                 HTML(' <a href = "https://pbs-assess.github.io/sdmTMB/", "sdmTMB", target = "_self" >sdmTMB</a>.'),
-                 "Because of differences in years or model settings, these results may not capture true distributions and may differ from other presentations. 
-                These maps are exploratory and should not be used as definitive sources for management decisions.")
+                 HTML(' <a href = "https://pbs-assess.github.io/sdmTMB/", "sdmTMB", target = "_blank" >sdmTMB</a>.'),
+                 "Because of differences in years or model settings, these results may not capture true distributions and may differ from other presentations. Notably, there are differences in gears between surveys (e.g., within the Aleutians/Bering Sea region) and these predictions are not adjusted for the resulting differences in catchability. Due to the large spatial scale, the maps are coarse approximations to broad spatial patterns and do not include habitat covariates which may be necessary for resolving fine-scale contrasts. These maps are exploratory and should not be used as definitive sources for management decisions or inference regarding population size at a specific location.")
         )
       )),
     withSpinner(uiOutput(ns("dynamicMap")), type = 3, size = 2, color.background = "#FFFFFFD0"), #dynamic height
