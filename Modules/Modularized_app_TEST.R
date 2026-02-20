@@ -138,7 +138,7 @@ ui <- page_sidebar(
     
     conditionalPanel( # default sidebar for most tabs
       condition = "input.tabs != 'Home'",
-      div("A tool to visualize data from NOAA and DFO surveys.",
+      div("A tool to visualize data from NOAA and DFO scientific surveys.",
           style = "font-size:16px; color:black;"),
       radioButtons(
         inputId = "region",
@@ -157,7 +157,7 @@ ui <- page_sidebar(
       condition = "input.tabs == 'Home'",
       div("A tool to visualize data from NOAA and DFO surveys.",
           style = "font-size:16px; color:black;"),
-      div("Select a tab to get started!",
+      div("Select a tab to get started.",
           style = "font-size:16px; color:black; font-weight: bold;")
     ),
     
@@ -167,7 +167,7 @@ ui <- page_sidebar(
         inputId = "surveys_selected_all",
         label = "Select surveys",
         choices = c(
-          "U.S. West Coast", "Hectate Strait" = "SYN HS", "Queen Chatlotte Sound" = "SYN QCS", "Haida Gwaii" = "SYN WCHG", "Vancouver Island" = "SYN WCVI",
+          "U.S. West Coast", "Hectate Strait" = "SYN HS", "Queen Chatlotte Sound" = "SYN QCS", "Haida Gwaii" = "SYN WCHG", "West Coast Vancouver Island" = "SYN WCVI",
           "Gulf of Alaska" = "U.S. Gulf of Alaska",
           "Aleutian Islands" = "U.S. Aleutian Islands",
           "Eastern Bering Slope" = "U.S. Eastern Bering Sea Slope",
@@ -192,7 +192,7 @@ ui <- page_sidebar(
       checkboxGroupInput(
         inputId = "surveys_selected_pbs",
         label = "Select surveys",
-        choices = c("Hectate Strait" = "SYN HS", "Queen Chatlotte Sound" = "SYN QCS", "Haida Gwaii" = "SYN WCHG", "Vancouver Island" = "SYN WCVI" )
+        choices = c("Hectate Strait" = "SYN HS", "Queen Chatlotte Sound" = "SYN QCS", "Haida Gwaii" = "SYN WCHG", "West Coast Vancouver Island" = "SYN WCVI" )
       )
     ), 
   ),
@@ -212,6 +212,17 @@ ui <- page_sidebar(
   
 
 server <- function(input, output, session) {
+  
+  #### Navigation handlers ####
+  # Handle actionLink clicks to navigate to Home tab
+  observeEvent(input$go_home_1, {
+    updateTabsetPanel(session, "tabs", selected = "Home")
+  })
+  
+  observeEvent(input$go_home_2, {
+    updateTabsetPanel(session, "tabs", selected = "Home")
+  })
+  
   
   #### species selection ####
   # Dynamic species selection based on region
