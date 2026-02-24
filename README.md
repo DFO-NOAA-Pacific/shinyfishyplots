@@ -2,6 +2,9 @@
 
 This repository contains a Shiny app for the Pacific Groundfish Data Synopsis. It relies on plotting functions and data from the [fishyplots](https://github.com/DFO-NOAA-Pacific/fishyplots) repository.
 
+A remotely hosted version is available at:
+<https://connect.fisheries.noaa.gov/pacific-survey-explorer/>
+
 To build the Shiny app locally, first install these packages:
 
 ```R
