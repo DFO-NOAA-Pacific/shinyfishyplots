@@ -1,3 +1,5 @@
+#Main app script for Pacific Survey Explorer
+## To run app, use this script that calls other module scripts
 
 library(shiny)
 library(bslib)
@@ -65,7 +67,7 @@ spp_list <- list(
 )
 
 
-#### Source modlule scripts ####
+#### Source module scripts ####
 source("home_module.R")
 source("biomass_module.R")
 source("agelength_module.R")
@@ -77,12 +79,13 @@ source("data_module.R")
 ui <- page_sidebar(
   
   #### Sidebar + Formatting ####
+  
+    # App title and color theme ####
   title = div(
     "Pacific Survey Explorer",
     style = "background-color:#2C3E79; color:white; font-weight:bold; 
              padding:12px; font-size:1.5em;"
   ),
-  
   
   sidebar_width = 2,
   
@@ -93,6 +96,8 @@ ui <- page_sidebar(
     secondary = "#2C3E79"),
   tags$style(
     
+    
+    # Colors for tabs and buttons # 
     HTML("
    .sidebar {
       background-color: #d8d8d8 !important;
@@ -232,6 +237,7 @@ server <- function(input, output, session) {
   })
   observeEvent(input$region, { 
     region_species <- spp_list[[input$region]]
+    
     # Check if currently selected species is also present in the newly selected region:
     current_spp <- input$species
     if (!is.null(current_spp) && current_spp %in% region_species) {
@@ -253,6 +259,7 @@ server <- function(input, output, session) {
       updateCheckboxGroupInput(session, "surveys_selected_pbs", selected = character(0))
     }, ignoreInit = TRUE)
   
+    
   #### CALL MODULE SERVERS ####
   home_Server("home")
   biomass_Server("biomass", all_dbi = all_dbi, region_names = region_names, 

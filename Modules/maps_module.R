@@ -1,9 +1,14 @@
-# maps module
+# Module - Maps
 
+
+
+#### UI #####
 maps_UI <- function(id) {
   ns <- NS(id)
   tagList(
   
+    
+    ### collapsible disclaimer and description ####
     accordion(
       open = NULL,
       accordion_panel(
@@ -17,16 +22,18 @@ maps_UI <- function(id) {
         )
       )),
     withSpinner(uiOutput(ns("dynamicMap")), type = 3, size = 2, color.background = "#FFFFFFD0"), #dynamic height
-    downloadButton(ns("downloadMapPlot"), "Download map"))
+    
+    downloadButton(ns("downloadMapPlot"), "Download map")) #download button
 }
 
 
+##### server #####
 maps_Server <- function(id, predictions, region_names, input_species) {
   moduleServer(
     id,
     function(input, output, session) {
+      
       #### Map plots and downloads ####
-     
       map_height1 <- reactive({
         if (setequal(region_names(), c("AK BSAI", "AK GULF", "PBS", "NWFSC"))) {
           "1800px"

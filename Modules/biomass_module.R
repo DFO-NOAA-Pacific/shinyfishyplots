@@ -1,22 +1,31 @@
-# biomass module
+# Module - Biomass
 
+
+##### UI #####
 biomass_UI <- function(id) {
   ns <- NS(id)
   tagList(
     
+    ### Collapsible description card ####
     uiOutput(ns("description_card")),
     
-    withSpinner(uiOutput(ns("dbiPlotUI")), type = 3, size = 2, color.background = "#FFFFFFD0"), #dynamic height
+    withSpinner(uiOutput(ns("dbiPlotUI")), type = 3, size = 2, color.background = "#FFFFFFD0"), #dynamic height for loading spinner
+    
+    # download buttons####
     downloadButton(ns("downloadBiomass"), "Download Biomass Plot"),
     downloadButton(ns("downloadStanBiomass"), "Download Standardized Biomass Plot"))
 }
 
+
+
+##### Server #####
 biomass_Server <- function(id, all_dbi, region_names, input_region, surveys_all, surveys_bsai, surveys_pbs, input_species) {
   moduleServer(
     id,
     function(input, output, session) {
       
       ## reactive and observe to separate and reset survey selections between multi-select regions
+      # this seemed to lose function after transition to modules, but a fix has been put into the main script
       surveys_selected <- reactive({
         region <- input_region()
         
@@ -52,9 +61,12 @@ biomass_Server <- function(id, all_dbi, region_names, input_region, surveys_all,
       
       #### Conditional description card ###
       output$description_card <- renderUI({
-        if (input_region() == "All regions") { # show card when "all regions" is selected
+        if (input_region() == "All regions") { 
+          
+          # show card when "all regions" is selected
         accordion(
           open = NULL,
+          
           accordion_panel(
             title = "Design-Based Biomass Indicies",
             card_body(
@@ -63,7 +75,9 @@ biomass_Server <- function(id, all_dbi, region_names, input_region, surveys_all,
                      " is selected, only standardized biomass indices are shown and can be viewed for multiple survey areas. Indices were standardized by dividing each survey's values by its mean, setting the average to 1. See ",
                      actionLink("go_home_1", "'About the Data' in the 'Home' tab", style = "color: #2C3E79; text-decoration: underline;"),
                      " for information on the region/survey groupings and abbreviations." ))) )
-          } else { #only show card when all regions NOT selected
+          } else { 
+            
+            #only show card when all regions NOT selected
         accordion(
           open = NULL,
           accordion_panel(
@@ -92,10 +106,7 @@ biomass_Server <- function(id, all_dbi, region_names, input_region, surveys_all,
    output$dbiPlot <- renderPlot({
         
         if (input_region() == "All regions") { # messages for no region or species 
-          # species <- input_species()
-          # surveys <- surveys_selected()
           
-          #req(surveys_selected())
           validate(
             need(input_species() != "" && input_species() != "None selected","Choose a species"),
             need(!is.null(surveys_selected()) && length(surveys_selected()) > 0, "Choose survey(s)"))
@@ -187,6 +198,7 @@ biomass_Server <- function(id, all_dbi, region_names, input_region, surveys_all,
             filename = function() {paste0("stan_biomass_plots_", input_species(), ".png")},
             content = function(file) {ggsave(file, plot =  plot_stan_dbi(input_species(), valid_dbi_surveys), width = 10, device = "png")})
         } else if (input_region() == "Canada"| input_region() =="Aleutians/Bering Sea") { # not all regions, but more than one survey
+          
           # show normal and standardized
           output$downloadBiomass <- downloadHandler(
             filename = function() {paste0("biomass_plot_", input_species(),"_", region_names(), ".png")},

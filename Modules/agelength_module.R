@@ -1,18 +1,22 @@
-# age and length module
+#Module - Age and Length
 
-
+##### UI #####
 agelength_UI <- function(id) {
   ns <- NS(id)
   tagList(
   
     #### Age and Length tab ####
    withSpinner(uiOutput(ns("dynamic_agelength")), type = 3, size = 2, color.background = "#FFFFFFD0"), #object containing all plots 
+   
+   ## info card ####
    card(
      full_screen = FALSE,
      card_header("Model Info", style = "background-color: #d7d7d7;"),
      card_body(tags$div(tags$strong("Growth:"),"Von-Bertalanffy growth curve"),
                tags$div(tags$strong("Length-Weight:"), "Log-log regression"),
                tags$div("See 'Data' tab to download biological and prediction datasets used in these plots."))),
+   
+   # download setup 
    downloadButton(ns("downloadGrowth"), "Download growth plot"),
    downloadButton(ns("downloadLW"), "Download length-weight plot"),
    downloadButton(ns("downloadLTS"), "Download average lengths plot"),
@@ -21,6 +25,8 @@ agelength_UI <- function(id) {
 
 }
 
+
+##### Server #####
 agelength_Server <- function(id, all_data, region_names, input_species, lw_predictions, vb_predictions) {
   moduleServer(
     id,
@@ -52,6 +58,7 @@ agelength_Server <- function(id, all_data, region_names, input_species, lw_predi
         p1 + p2 + p3 + p4 + p5 + plot_layout(ncol = 1, heights = c(1, 1, 1, 1.5, 1))
       })
       
+      # adaptive plot area sizing
       plot_width <- reactive({
         if (setequal(region_names(), c("AK BSAI", "AK GULF", "PBS", "NWFSC"))) {
           1200 / 96
@@ -60,6 +67,8 @@ agelength_Server <- function(id, all_data, region_names, input_species, lw_predi
         }
       })
       
+      
+      # Plot downloads ####
       output$downloadGrowth <- downloadHandler(
         filename = function() {paste0("growth_plot_", input_species(), ".png")},
         content = function(file) {ggsave(file, plot = plot_growth(all_data, region_names(), input_species()), width = plot_width(), device = "png")})

@@ -1,9 +1,12 @@
-## data tab module
+#Module - Data
 
+
+#####UI ####
 data_UI <- function(id) {
   ns <- NS(id)
   tagList(
   
+    ## description card ####
     accordion(
       open = NULL,
       accordion_panel(
@@ -11,9 +14,13 @@ data_UI <- function(id) {
         card_body("These plots display the number of biological measurements taken and tow effort for selected regions and species. 'Unread Ages' are the number of fishes with age structures collected but not analysed. For unrounded counts, use the data download below. "))),
     div(style = "overflow-x: scroll; min-width: 1200px;", #scrollable window
         withSpinner(plotOutput(ns("surveytable")), type = 3, size = 2, color.background = "#FFFFFFD0")),
+    
+    # download buttons
     downloadButton(ns("downloadSurveyTable"), "Download Survey Plot"),
     downloadButton(ns("downloadSurveyTibble"), "Download Survey Plot Data (Unrounded Counts)"),
     tags$div(Style = "margin-top: 50px;"),
+    
+   # download selection card and previews
     card(
       full_screen = FALSE,
       card_header("Data download options for selected region and species", style = "background-color: #d7d7d7;")),
@@ -34,6 +41,8 @@ data_UI <- function(id) {
     
 }
 
+
+##### Server ####
 data_Server <- function(id, all_data, lw_predictions, vb_predictions, predictions, region_names,input_species) {
   moduleServer(
     id,
@@ -69,6 +78,8 @@ data_Server <- function(id, all_data, lw_predictions, vb_predictions, prediction
       }, width = 1200,  height = function() {
         275 * length(region_names()) #dynamically change plot size based on how many are plotted
       })
+      
+      # Download counts
       observeEvent(
         output$downloadSurveyTable <- downloadHandler(
           filename = function() {paste0("SurveyCount_plot_", input_species(), ".png")},

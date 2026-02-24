@@ -1,14 +1,21 @@
- #Depth module
+# Module - Depth
 
+
+##### UI #####
 depth_UI <- function(id) {
   ns <- NS(id)
   tagList(
   
     withSpinner(uiOutput(ns("dynamic_depth")), type = 3, size = 2, color.background = "#FFFFFFD0"),
+    
+    #download buttons
     downloadButton(ns("downloadAgeDepthPlot"), "Download age-depth plot"),
     downloadButton(ns("downloadLengthDepthPlot"), "Download length-depth plot"))
 
 }
+
+
+#### Server ####
 
 depth_Server <- function(id, all_data, region_names, input_species) {
   moduleServer(
@@ -41,6 +48,8 @@ depth_Server <- function(id, all_data, region_names, input_species) {
         req(input_species() != "None selected")
         plot_length_depth(all_data, region_names(), input_species())})
       
+      
+      # data downloads
       output$downloadAgeDepthPlot <- downloadHandler(
         filename = function() {paste0("age_depth_plot_", input_species(), ".png")},
         content = function(file) {ggsave(file, plot = plot_age_depth(all_data, region_names(), input_species()), width = plot_width(), device = "png")})
