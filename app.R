@@ -67,14 +67,6 @@ spp_list <- list(
 )
 
 
-#### Source module scripts ####
-source("home_module.R")
-source("biomass_module.R")
-source("agelength_module.R")
-source("maps_module.R")
-source("depth_module.R")
-source("data_module.R")
-
 ###### UI #####
 ui <- page_sidebar(
   
