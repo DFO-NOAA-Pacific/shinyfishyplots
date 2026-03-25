@@ -274,7 +274,7 @@ server <- function(input, output, session) {
   depth_Server("depth", all_data = all_data,
                region_names = region_names,
                input_species = reactive(input$species))
-  data_Server("data", all_data = all_data,lw_predictions = lw_predictions, vb_predictions = vb_predictions, predictions = predictions, region_names = region_names,
+  data_Server("data", all_dbi = all_dbi, all_data = all_data,lw_predictions = lw_predictions, vb_predictions = vb_predictions, predictions = predictions, region_names = region_names,
               input_species = reactive(input$species))
   
 }
