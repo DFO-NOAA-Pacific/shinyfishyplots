@@ -43,7 +43,7 @@ data_UI <- function(id) {
 
 
 ##### Server ####
-data_Server <- function(id, all_data, lw_predictions, vb_predictions, predictions, region_names,input_species) {
+data_Server <- function(id, all_dbi, all_data, lw_predictions, vb_predictions, predictions, region_names,input_species) {
   moduleServer(
     id,
     function(input, output, session) {
