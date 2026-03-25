@@ -50,6 +50,15 @@ depth_Server <- function(id, all_data, region_names, input_species) {
       
       
       # data downloads
+      # adaptive plot area sizing
+      plot_width <- reactive({
+        if (setequal(region_names(), c("AK BSAI", "AK GULF", "PBS", "NWFSC"))) {
+          1200 / 96
+        } else {
+          800 / 96
+        }
+      })
+      
       output$downloadAgeDepthPlot <- downloadHandler(
         filename = function() {paste0("age_depth_plot_", input_species(), ".png")},
         content = function(file) {ggsave(file, plot = plot_age_depth(all_data, region_names(), input_species()), width = plot_width(), device = "png")})
