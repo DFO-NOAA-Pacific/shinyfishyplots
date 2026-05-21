@@ -28,11 +28,13 @@ home_UI <- function(id) {
                         We also added the top 20 species that have been ranked as occurring in multiple areas, as part of the ",
                HTML(' <a href = "https://doi.org/10.5281/zenodo.10031852" target = "_blank" >surveyjoin</a> package.'),
                "See citations for more information on the surveys and data collection. Note that some surveys use different gears and protocols, which can influence catchability and selectivity; 
-            yet such surveys are combined within the Aleutians/Bering Sea region here to align data summaries with fishery management areas (for exploratory purposes only)."),
+            yet such surveys are combined within the Aleutians/Bering Sea {BSAI} region here to align data summaries with fishery management areas (for exploratory purposes only)."),
         tags$b(tags$u("Regions and Associated Surveys")),
         tags$div(
-          tags$strong("Aleutians/Bering Sea (AFSC):"), tags$br(),
+          tags$strong("Aleutian Islands (AFSC):"), tags$br(),
           tags$div(style = "margin-left: 1em;", "Aleutian Islands"),
+          tags$br(),
+          tags$strong("Bering Sea (AFSC):"), tags$br(),
           tags$div(style = "margin-left: 1em;", "U.S. Eastern Bering Sea Slope"),
           tags$div(style = "margin-left: 1em;", "U.S. Eastern Bering Sea Standard Plus NW Region"),
           tags$div(style = "margin-left: 1em;", "U.S. Northern Bering Sea"),

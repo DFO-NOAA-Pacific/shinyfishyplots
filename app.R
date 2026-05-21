@@ -5,7 +5,7 @@ library(shiny)
 library(bslib)
 library(surveyjoin)
 library(sdmTMB)
-library(fishyplots) #devtools::install_github("DFO-NOAA-Pacific/fishyplots")
+#library(fishyplots) #devtools::install_github("DFO-NOAA-Pacific/fishyplots")
 library(ggplot2)
 library(dplyr)
 library(patchwork)
@@ -19,9 +19,11 @@ data(nwfsc_bio)
 nwfsc_bio <- nwfsc_bio |>  filter(!common_name == "walleye pollock") #only one walleye, breaks some functions
 data(afsc_bio)
 data(pbs_bio)
-akbsai <- afsc_bio |> filter(survey == "AK BSAI")
+akbs <- afsc_bio |> dplyr::filter(survey == "AK BERING")
+akai <- afsc_bio |> dplyr::filter(survey == "AK ALEUTIANS")
 akgulf <- afsc_bio |> filter(survey == "AK GULF")
 all_data <- bind_rows(afsc_bio, nwfsc_bio, pbs_bio)
+
 
 # Load prediction data
 data(vb_predictions)
@@ -33,8 +35,10 @@ predictions <- predictions |>
   mutate(subregion = case_when(
     region == "NWFSC" ~ "NWFSC",
     region == "PBS" ~ "PBS",
-    region == "Gulf of Alaska Bottom Trawl Survey" ~ "AK GULF",
-    TRUE ~ "AK BSAI"
+    survey == "Gulf of Alaska Bottom Trawl Survey" ~ "AK GULF",
+    survey == "Aleutian Islands Bottom Trawl Survey" ~ "AK ALEUTIANS",
+    str_detect(survey, "Bering") ~ "AK BERING", #any surveys with "bering"
+    TRUE ~ "ERROR" #error marker in case something is missed
   ))
 
 # Load biomass data
@@ -50,7 +54,8 @@ data("all_dbi")
 
 # Create species list for each region
 # spp_list <- list(
-#   "Aleutians/Bering Sea" = sort(unique(akbsai$common_name)),
+#   "Aleutian Islands" = sort(unique(akai$common_name)),
+#   "Bering Sea" = sort(unique(akbs$common_name)),
 #   "Gulf of Alaska" = sort(unique(akgulf$common_name)),
 #   "US West Coast" = sort(unique(nwfsc_bio$common_name)),
 #   "Canada" = sort(unique(pbs_bio$common_name)),
@@ -59,7 +64,8 @@ data("all_dbi")
 
 # species list for region selections (all the same)
 spp_list <- list(
-  "Aleutians/Bering Sea" = sort(unique(all_data$common_name)),
+  "Aleutian Islands" = sort(unique(all_data$common_name)),
+  "Bering Sea" = sort(unique(all_data$common_name)),
   "Gulf of Alaska" = sort(unique(all_data$common_name)),
   "US West Coast" = sort(unique(all_data$common_name)),
   "Canada" = sort(unique(all_data$common_name)),
@@ -85,7 +91,9 @@ ui <- page_sidebar(
     bg = "#FFF",
     fg = "#101010",
     primary = "#2C3E79",
-    secondary = "#2C3E79"),
+    secondary = "#2C3E79",
+    navbar_bg = "#2C3E79",
+    navbar_fg = "white"),
   tags$style(
     
     
@@ -140,7 +148,7 @@ ui <- page_sidebar(
       radioButtons(
         inputId = "region",
         label = "Choose a region",
-        choices = list("All regions", "Aleutians/Bering Sea", "Gulf of Alaska", "Canada", "US West Coast"),
+        choices = list("All regions", "Aleutian Islands", "Bering Sea", "Gulf of Alaska", "Canada", "US West Coast"),
         selected = "All regions"
       ),
       selectInput(
@@ -164,21 +172,20 @@ ui <- page_sidebar(
         inputId = "surveys_selected_all",
         label = "Select surveys",
         choices = c(
-          "U.S. West Coast", "Hectate Strait" = "SYN HS", "Queen Chatlotte Sound" = "SYN QCS", "Haida Gwaii" = "SYN WCHG", "West Coast Vancouver Island" = "SYN WCVI",
-          "Gulf of Alaska" = "U.S. Gulf of Alaska",
-          "Aleutian Islands" = "U.S. Aleutian Islands",
-          "Eastern Bering Slope" = "U.S. Eastern Bering Sea Slope",
-          "Eastern Bering and NW" = "U.S. Eastern Bering Sea Standard Plus NW Region",
-          "Northern Bering" = "U.S. Northern Bering Sea" )
+          "Aleutian Islands" = "U.S. Aleutian Islands", # aleutians
+          "Eastern Bering Slope" = "U.S. Eastern Bering Sea Slope","Eastern Bering and NW" = "U.S. Eastern Bering Sea Standard Plus NW Region", "Northern Bering" = "U.S. Northern Bering Sea", #bering
+          "Gulf of Alaska" = "U.S. Gulf of Alaska", #gulf
+          "Hectate Strait" = "SYN HS", "Queen Chatlotte Sound" = "SYN QCS", "Haida Gwaii" = "SYN WCHG", "West Coast Vancouver Island" = "SYN WCVI", # canada
+          "U.S. West Coast" # US WC
+          )
       )
     ), 
-    conditionalPanel( # additional selection menus for AK BSAI BIOMASS
-      condition = "input.region == 'Aleutians/Bering Sea' && input.tabs == 'Biomass'",
+    conditionalPanel( # additional selection menus for AK BERING BIOMASS
+      condition = "input.region == 'Bering Sea' && input.tabs == 'Biomass'",
       checkboxGroupInput(
-        inputId = "surveys_selected_bsai",
-        label = "Select surveys)",
+        inputId = "surveys_selected_bering",
+        label = "Select surveys",
         choices = c(
-          "Aleutian Islands" = "U.S. Aleutian Islands",
           "Eastern Bering Slope" = "U.S. Eastern Bering Sea Slope",
           "Eastern Bering and NW" = "U.S. Eastern Bering Sea Standard Plus NW Region",
           "Northern Bering" = "U.S. Northern Bering Sea")
@@ -225,7 +232,7 @@ server <- function(input, output, session) {
   # Dynamic species selection based on region
   region_names <- reactive({
     switch(input$region,
-           "US West Coast" = "NWFSC", "Canada" = "PBS", "Aleutians/Bering Sea" = "AK BSAI", "Gulf of Alaska" = "AK GULF", "All regions" = c("AK BSAI", "AK GULF", "PBS", "NWFSC"))
+           "US West Coast" = "NWFSC", "Canada" = "PBS", "Aleutian Islands" = "AK ALEUTIANS","Bering Sea" = "AK BERING", "Gulf of Alaska" = "AK GULF", "All regions" = c("AK ALEUTIANS","AK BERING", "AK GULF", "PBS", "NWFSC"))
   })
   observeEvent(input$region, { 
     region_species <- spp_list[[input$region]]
@@ -247,7 +254,7 @@ server <- function(input, output, session) {
     # reset biomass survey selections after choosing different region
     observeEvent(input$region, {
       updateCheckboxGroupInput(session, "surveys_selected_all", selected = character(0))
-      updateCheckboxGroupInput(session, "surveys_selected_bsai", selected = character(0))
+      updateCheckboxGroupInput(session, "surveys_selected_bering", selected = character(0))
       updateCheckboxGroupInput(session, "surveys_selected_pbs", selected = character(0))
     }, ignoreInit = TRUE)
   
@@ -256,7 +263,7 @@ server <- function(input, output, session) {
   home_Server("home")
   biomass_Server("biomass", all_dbi = all_dbi, region_names = region_names, 
                  surveys_all = reactive(input$surveys_selected_all),
-                 surveys_bsai = reactive(input$surveys_selected_bsai),
+                 surveys_bering = reactive(input$surveys_selected_bering),
                  surveys_pbs = reactive(input$surveys_selected_pbs), input_region = reactive(input$region),
                  input_species = reactive(input$species))
   agelength_Server("agelength",all_data = all_data, region_names = region_names,

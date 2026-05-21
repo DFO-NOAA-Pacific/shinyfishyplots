@@ -36,7 +36,7 @@ agelength_Server <- function(id, all_data, region_names, input_species, lw_predi
       #### length, age, growth plots and downloads ####
       output$dynamic_agelength <- renderUI({
         ns <- session$ns
-        width <- if (identical(region_names(), c("AK BSAI", "AK GULF", "PBS", "NWFSC"))) "100%" else "65%"
+        width <- if (identical(region_names(), c("AK ALEUTIANS","AK BERING", "AK GULF", "PBS", "NWFSC"))) "100%" else "65%"
         plotOutput(ns("agelengthPlot"), width = width, height = "1250px")})
       
       output$agelengthPlot <- renderPlot({
@@ -60,7 +60,7 @@ agelength_Server <- function(id, all_data, region_names, input_species, lw_predi
       
       # adaptive plot area sizing
       plot_width <- reactive({
-        if (setequal(region_names(), c("AK BSAI", "AK GULF", "PBS", "NWFSC"))) {
+        if (setequal(region_names(), c("AK ALEUTIANS","AK BERING", "AK GULF", "PBS", "NWFSC"))) {
           1200 / 96
         } else {
           800 / 96

@@ -19,7 +19,7 @@ biomass_UI <- function(id) {
 
 
 ##### Server #####
-biomass_Server <- function(id, all_dbi, region_names, input_region, surveys_all, surveys_bsai, surveys_pbs, input_species) {
+biomass_Server <- function(id, all_dbi, region_names, input_region, surveys_all, surveys_bering, surveys_pbs, input_species) {
   moduleServer(
     id,
     function(input, output, session) {
@@ -31,8 +31,8 @@ biomass_Server <- function(id, all_dbi, region_names, input_region, surveys_all,
         
         result <- if (region == "All regions") {
           surveys_all()
-        } else if (region == "Aleutians/Bering Sea") {
-          surveys_bsai()
+        } else if (region == "Bering Sea") {
+          surveys_bering()
         } else if (region == "Canada") {
           surveys_pbs()
         } else {
@@ -49,7 +49,7 @@ biomass_Server <- function(id, all_dbi, region_names, input_region, surveys_all,
         )
         updateCheckboxGroupInput(
           session = getDefaultReactiveDomain(),
-          inputId = "surveys_selected_bsai", 
+          inputId = "surveys_selected_bering", 
           selected = character(0)
         )
         updateCheckboxGroupInput(
@@ -68,7 +68,7 @@ biomass_Server <- function(id, all_dbi, region_names, input_region, surveys_all,
           open = NULL,
           
           accordion_panel(
-            title = "Design-Based Biomass Indicies",
+            title = "Design-Based Biomass Indices",
             card_body(
               tags$p("When", 
                      tags$strong("'All Regions'"),
@@ -81,8 +81,8 @@ biomass_Server <- function(id, all_dbi, region_names, input_region, surveys_all,
         accordion(
           open = NULL,
           accordion_panel(
-            title = "Design-Based Biomass Indicies",
-            card_body(tags$div("These biomass indicies are design-based and may be calculated differently among science centers.",
+            title = "Design-Based Biomass Indices",
+            card_body(tags$div("These biomass indices are design-based and may be calculated differently among science centers.",
                                tags$strong("Not all surveys have yearly biomass estimates."),
                                " Indices were standardized by dividing each survey's values by its mean, setting the average to 1. To compare standardized biomass estimations for different regions, select 'All Regions'. See ",
                                actionLink("go_home_2", "'About the Data' in the 'Home' tab", style = "color: #2C3E79; text-decoration: underline;"),
@@ -108,8 +108,8 @@ biomass_Server <- function(id, all_dbi, region_names, input_region, surveys_all,
         if (input_region() == "All regions") { # messages for no region or species 
           
           validate(
-            need(input_species() != "" && input_species() != "None selected","Choose a species"),
-            need(!is.null(surveys_selected()) && length(surveys_selected()) > 0, "Choose survey(s)"))
+            need(input_species() != "" && input_species() != "None selected","Choose a species from sidebar"),
+            need(!is.null(surveys_selected()) && length(surveys_selected()) > 0, "Choose survey(s) from sidebar"))
           
           #create message if there is no DBI data for all selected surveys
           valid_dbi_surveys <- all_dbi |> 
@@ -133,13 +133,13 @@ biomass_Server <- function(id, all_dbi, region_names, input_region, surveys_all,
           plot_stan_dbi(input_species(), valid_dbi_surveys) # show only standardized plot if All regions selected
           
           
-        } else if (input_region() == "Canada"| input_region() =="Aleutians/Bering Sea") { # options for regions with multiple surveys
+        } else if (input_region() == "Canada"| input_region() =="Bering Sea") { # options for regions with multiple surveys
           
           validate(#message for none selected
             need(!is.null(surveys_selected()) && length(surveys_selected()) > 0,
-                 "Choose survey(s)"),
+                 "Choose survey(s) from sidebar"),
             need(input_species() != "" && input_species() != "None selected",
-                 paste("Choose a species")))
+                 paste("Choose a species from sidebar")))
           
           
           #create message if there is no DBI data for selected surveys
@@ -168,7 +168,7 @@ biomass_Server <- function(id, all_dbi, region_names, input_region, surveys_all,
           
           validate( #message for none selected
             need(input_species() != "" && input_species() != "None selected",
-                 paste("Choose a species")))
+                 paste("Choose a species from sidebar")))
           
           #create message if there is no DBI data for selected surveys
           valid_dbi_surveys <- all_dbi |> 
@@ -197,7 +197,7 @@ biomass_Server <- function(id, all_dbi, region_names, input_region, surveys_all,
           output$downloadStanBiomass <- downloadHandler(
             filename = function() {paste0("stan_biomass_plots_", input_species(), ".png")},
             content = function(file) {ggsave(file, plot =  plot_stan_dbi(input_species(), valid_dbi_surveys), width = 10, device = "png")})
-        } else if (input_region() == "Canada"| input_region() =="Aleutians/Bering Sea") { # not all regions, but more than one survey
+        } else if (input_region() == "Canada"| input_region() =="Bering Sea") { # not all regions, but more than one survey
           
           # show normal and standardized
           output$downloadBiomass <- downloadHandler(
