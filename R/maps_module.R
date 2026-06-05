@@ -50,7 +50,7 @@ maps_Server <- function(id, predictions, region_names, input_species) {
         ns <- session$ns
         validate( #message for none selected
           need(input_species() != "" && input_species() != "None selected",
-               paste("Choose a species")))
+               paste("Choose a species from sidebar")))
         req(input_species() != "None selected")
         plotOutput(ns("modelPlot"), height = map_height1())
       })
@@ -59,7 +59,7 @@ maps_Server <- function(id, predictions, region_names, input_species) {
        
         validate( #message for none selected
           need(input_species() != "" && input_species() != "None selected",
-               paste("Choose a species")))
+               paste("Choose a species from sidebar")))
         req(input_species() != "None selected")
         fishmap(predictions, region_names(), input_species())})
       

@@ -42,7 +42,7 @@ agelength_Server <- function(id, all_data, region_names, input_species, lw_predi
       output$agelengthPlot <- renderPlot({
         validate( #message for none selected
           need(input_species() != "" && input_species() != "None selected",
-               paste("Choose a species")))
+               paste("Choose a species from sidebar")))
         req(input_species() != c("None selected", ""))
         # Growth plot
         p1 <- plot_growth(all_data, region_names(), input_species()) 

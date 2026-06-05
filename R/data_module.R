@@ -72,7 +72,7 @@ data_Server <- function(id, all_dbi, all_data, lw_predictions, vb_predictions, p
       output$surveytable <- renderPlot({
         validate( #message for none selected
           need(input_species() != "" && input_species() != "None selected",
-               paste("Choose a species")))
+               paste("Choose a species from sidebar")))
         req(!(input_species() %in% c("None selected", "")))
         survey_table(all_data , region_names(), input_species(), form = 2, facet_all = TRUE)
       }, width = 1200,  height = function() {
