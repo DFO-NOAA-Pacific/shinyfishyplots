@@ -27,8 +27,7 @@ home_UI <- function(id) {
                  For each survey region (U.S. West Coast, British Columbia, Alaska), we identified the top 20 species with respect to total biomass in all survey years. 
                         We also added the top 20 species that have been ranked as occurring in multiple areas, as part of the ",
                HTML(' <a href = "https://doi.org/10.5281/zenodo.10031852" target = "_blank" >surveyjoin</a> package.'),
-               "See citations for more information on the surveys and data collection. Note that some surveys use different gears and protocols, which can influence catchability and selectivity; 
-            yet such surveys are combined within the Aleutians/Bering Sea region here to align data summaries with fishery management areas (for exploratory purposes only)."),
+               "See citations for more information on the surveys and data collection. Note that some surveys use different gears and protocols among and within regions (e.g., U.S. Bering Sea slope and shelf bottom trawl surveys), which can influence catchability and selectivity."),
         tags$b(tags$u("Regions and Associated Surveys")),
         tags$div(
           tags$strong("Aleutians/Bering Sea (AFSC):"), tags$br(),
