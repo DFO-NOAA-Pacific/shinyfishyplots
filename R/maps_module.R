@@ -35,9 +35,9 @@ maps_Server <- function(id, predictions, region_names, input_species) {
       
       #### Map plots and downloads ####
       map_height1 <- reactive({
-        if (setequal(region_names(), c("AK BSAI", "AK GULF", "PBS", "NWFSC"))) {
+        if (setequal(region_names(), c("AK ALEUTIANS","AK BERING", "AK GULF", "PBS", "NWFSC"))) {
           "1800px"
-        } else if (region_names() %in% c("AK BSAI", "AK GULF")) {
+        } else if (region_names() %in% c("AK ALEUTIANS","AK BERING", "AK GULF")) {
           "450px"
         } else if (region_names() == "NWFSC") {
           "800px"
@@ -50,7 +50,7 @@ maps_Server <- function(id, predictions, region_names, input_species) {
         ns <- session$ns
         validate( #message for none selected
           need(input_species() != "" && input_species() != "None selected",
-               paste("Choose a species")))
+               paste("Choose a species from sidebar")))
         req(input_species() != "None selected")
         plotOutput(ns("modelPlot"), height = map_height1())
       })
@@ -59,14 +59,14 @@ maps_Server <- function(id, predictions, region_names, input_species) {
        
         validate( #message for none selected
           need(input_species() != "" && input_species() != "None selected",
-               paste("Choose a species")))
+               paste("Choose a species from sidebar")))
         req(input_species() != "None selected")
         fishmap(predictions, region_names(), input_species())})
       
       map_height2 <- reactive({
-        if (setequal(region_names(), c("AK BSAI", "AK GULF", "PBS", "NWFSC"))) {
+        if (setequal(region_names(), c("AK ALEUTIANS","AK BERING", "AK GULF", "PBS", "NWFSC"))) {
           1800 / 96
-        } else if (region_names() %in% c("AK BSAI", "AK GULF")) {
+        } else if (region_names() %in% c("AK ALEUTIANS","AK BERING", "AK GULF")) {
           450 / 96
         } else if (region_names() == "NWFSC") {
           800 / 96

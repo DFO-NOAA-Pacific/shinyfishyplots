@@ -27,8 +27,8 @@ depth_Server <- function(id, all_data, region_names, input_species) {
         ns <- session$ns
         validate( #message for none selected
           need(input_species() != "" && input_species() != "None selected",
-               paste("Choose a species")))
-        width <- if (identical(region_names(), c("AK BSAI", "AK GULF", "PBS", "NWFSC"))) "100%" else "80%"
+               paste("Choose a species from sidebar")))
+        width <- if (identical(region_names(), c("AK ALEUTIANS","AK BERING", "AK GULF", "PBS", "NWFSC"))) "100%" else "80%"
         tagList(plotOutput(ns("age_depthPlot"), width = width, height = "600px"),
                 plotOutput(ns("length_depthPlot"), width = width, height = "600px")) })
       
@@ -36,7 +36,7 @@ depth_Server <- function(id, all_data, region_names, input_species) {
        
         validate( #message for none selected
           need(input_species() != "" && input_species() != "None selected",
-               paste("Choose a species")))
+               paste("Choose a species from sidebar")))
         req(input_species() != "None selected")
         plot_age_depth(all_data, region_names(), input_species())})
       
@@ -44,7 +44,7 @@ depth_Server <- function(id, all_data, region_names, input_species) {
         
         validate( #message for none selected
           need(input_species() != "" && input_species() != "None selected",
-               paste("Choose a species")))
+               paste("Choose a species from sidebar")))
         req(input_species() != "None selected")
         plot_length_depth(all_data, region_names(), input_species())})
       
@@ -52,7 +52,7 @@ depth_Server <- function(id, all_data, region_names, input_species) {
       # data downloads
       # adaptive plot area sizing
       plot_width <- reactive({
-        if (setequal(region_names(), c("AK BSAI", "AK GULF", "PBS", "NWFSC"))) {
+        if (setequal(region_names(), c("AK ALEUTIANS","AK BERING", "AK GULF", "PBS", "NWFSC"))) {
           1200 / 96
         } else {
           800 / 96
